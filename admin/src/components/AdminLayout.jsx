@@ -18,13 +18,13 @@ export default function AdminLayout() {
 
   const signOut = () => {
     logout();
-    navigate("/admin");
+    navigate("/");
   };
 
   const Sidebar = () => (
     <aside className="admin-card flex h-full flex-col rounded-[28px] p-4">
       <div className="mb-8 flex items-center gap-3 px-2">
-        <img src="/assets/logo.jpg" alt="" className="h-11 w-11 rounded-full object-cover" />
+        <img src={`${import.meta.env.BASE_URL}assets/logo.jpg`} alt="" className="h-11 w-11 rounded-full object-cover" />
         <div>
           <p className="font-display text-xl font-bold">Mahin Admin</p>
           <p className="text-xs text-vellum/50">{admin?.email}</p>
