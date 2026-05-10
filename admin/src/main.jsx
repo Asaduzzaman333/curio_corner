@@ -13,18 +13,39 @@ const Orders = lazy(() => import("./pages/Orders.jsx"));
 const Content = lazy(() => import("./pages/Content.jsx"));
 const Media = lazy(() => import("./pages/Media.jsx"));
 
+<<<<<<< HEAD
 function AdminRoot() {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <AdminLayout /> : <Login />;
+=======
+function Protected({ children }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/admin" replace />;
+>>>>>>> 4292013668882ef06c50bcc3180dcc50f830320d
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
+<<<<<<< HEAD
       <BrowserRouter basename="/admin">
         <Suspense fallback={<div className="p-8">Loading admin...</div>}>
           <Routes>
             <Route path="/" element={<AdminRoot />}>
+=======
+      <BrowserRouter>
+        <Suspense fallback={<div className="p-8">Loading admin...</div>}>
+          <Routes>
+            <Route path="/admin" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <Protected>
+                  <AdminLayout />
+                </Protected>
+              }
+            >
+>>>>>>> 4292013668882ef06c50bcc3180dcc50f830320d
               <Route index element={<Dashboard />} />
               <Route path="products" element={<Products />} />
               <Route path="orders" element={<Orders />} />

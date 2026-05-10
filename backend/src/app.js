@@ -59,7 +59,11 @@ app.use(
   })
 );
 
+<<<<<<< HEAD
 app.get("/api/health", (req, res) => res.json({ ok: true, service: "curio-corner-api" }));
+=======
+app.get("/api/health", (req, res) => res.json({ ok: true, service: "mahin-api" }));
+>>>>>>> 4292013668882ef06c50bcc3180dcc50f830320d
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);

@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "name": "@curio-corner/admin",
+=======
+  "name": "@mahin/admin",
+>>>>>>> 4292013668882ef06c50bcc3180dcc50f830320d
   "version": "1.0.0",
   "private": true,
   "type": "module",
