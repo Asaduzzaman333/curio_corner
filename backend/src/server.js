@@ -46,7 +46,15 @@ if (!process.env.VERCEL) {
 }
 
 export default async function handler(req, res) {
-  await connectDB();
-  await ensureDefaultAdmin();
-  return app(req, res);
+  try {
+    await connectDB();
+    await ensureDefaultAdmin();
+    return app(req, res);
+  } catch (error) {
+    console.error("API startup failed", error);
+    return res.status(500).json({
+      message: "API startup failed",
+      error: process.env.NODE_ENV === "production" ? "Check Vercel function logs and environment variables" : error.message
+    });
+  }
 }
