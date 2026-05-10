@@ -59,7 +59,7 @@ app.use(
   })
 );
 
-app.get("/api/health", (req, res) => res.json({ ok: true, service: "mahin-api" }));
+app.get("/api/health", (req, res) => res.json({ ok: true, service: "curio-corner-api" }));
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);

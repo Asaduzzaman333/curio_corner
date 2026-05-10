@@ -5,7 +5,7 @@ const mediaSchema = new mongoose.Schema(
     url: { type: String, required: true },
     publicId: String,
     alt: String,
-    folder: { type: String, default: "mahin" },
+    folder: { type: String, default: "curio-corner" },
     format: String,
     width: Number,
     height: Number,

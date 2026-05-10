@@ -11,7 +11,7 @@ const linkSchema = new mongoose.Schema(
 const siteSettingsSchema = new mongoose.Schema(
   {
     key: { type: String, default: "main", unique: true },
-    brandName: { type: String, default: "Mahin Handmade" },
+    brandName: { type: String, default: "Curio Corner" },
     logo: { url: { type: String, default: "/assets/logo.jpg" }, publicId: String },
     cover: { url: { type: String, default: "/assets/cover.jpg" }, publicId: String },
     about: {

@@ -12,7 +12,7 @@ export const mediaRoutes = express.Router();
 const uploadBuffer = (file) =>
   new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "mahin-handmade", resource_type: "image", quality: "auto", fetch_format: "auto" },
+      { folder: "curio-corner", resource_type: "image", quality: "auto", fetch_format: "auto" },
       (error, result) => (error ? reject(error) : resolve(result))
     );
     Readable.from(file.buffer).pipe(stream);

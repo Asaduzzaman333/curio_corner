@@ -5,7 +5,7 @@ import PageHeader from "../components/PageHeader.jsx";
 import { api } from "../utils/api.js";
 
 const fallback = {
-  brandName: "Mahin Handmade",
+  brandName: "Curio Corner",
   logo: { url: "/assets/logo.jpg" },
   cover: { url: "/assets/cover.jpg" },
   homepage: { headline: "", subheadline: "", ctaLabel: "" },

@@ -1,5 +1,5 @@
 export const fallbackSettings = {
-  brandName: "Mahin Handmade",
+  brandName: "Curio Corner",
   logo: { url: "/assets/logo.jpg" },
   cover: { url: "/assets/cover.jpg" },
   whatsappNumber: "+8801700000000",
@@ -14,7 +14,7 @@ export const fallbackSettings = {
   },
   contact: {
     phone: "+880 1700 000000",
-    email: "hello@mahinhandmade.com",
+    email: "hello@curiocorner.com",
     address: "Dhaka, Bangladesh"
   },
   testimonials: [
