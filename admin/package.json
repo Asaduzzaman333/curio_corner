@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5174",
-    "build": "vite build",
+    "build": "npm install vite@4.5.5 rollup@3.30.0 @vitejs/plugin-react@4.3.4 --no-save --package-lock=false --no-audit --prefer-online && node scripts/build-vite.cjs",
     "preview": "vite preview --host 0.0.0.0 --port 4174"
   },
   "dependencies": {
