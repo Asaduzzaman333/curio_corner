@@ -159,7 +159,6 @@ export default function Home() {
     </>
   );
 }
-<<<<<<< HEAD
 
 function CategoryTile({ category, Icon }) {
   return (
@@ -172,5 +171,3 @@ function CategoryTile({ category, Icon }) {
     </Link>
   );
 }
-=======
->>>>>>> 4292013668882ef06c50bcc3180dcc50f830320d
