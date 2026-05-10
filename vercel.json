@@ -4,6 +4,14 @@
   "installCommand": "npm install --package-lock=false --prefer-online --no-audit",
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/admin/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -1,4 +1,4 @@
-# Mahin Handmade Commerce
+# Curio Corner Commerce
 
 Production-ready handmade crafts eCommerce platform with a public storefront, separate secure admin app, and Node/Express/Mongo REST API.
 
