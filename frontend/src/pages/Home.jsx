@@ -9,6 +9,8 @@ import { useSite } from "../context/SiteContext.jsx";
 import { api } from "../utils/api.js";
 import { categories, fallbackProducts } from "../data/fallback.js";
 
+const categoryIcons = [Gift, Heart, Sparkles, Star, ArrowRight];
+
 export default function Home() {
   const { settings } = useSite();
   const [products, setProducts] = useState(fallbackProducts);
@@ -82,13 +84,7 @@ export default function Home() {
           <SectionTitle eyebrow="Categories" title="Designed around the occasion" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {categories.map((category, index) => (
-              <Link key={category} to={`/shop?category=${encodeURIComponent(category)}`} className="group rounded-[28px] bg-vellum p-6 shadow-soft transition hover:-translate-y-1 dark:bg-[#211915]">
-                <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-clay/10 text-clay">
-                  {[Gift, Heart, Sparkles, Star, ArrowRight][index % 5]({ size: 21 })}
-                </div>
-                <h3 className="font-display text-xl font-bold">{category}</h3>
-                <p className="mt-3 text-sm leading-6 text-ink/60 dark:text-vellum/60">Explore handmade details for meaningful gifting.</p>
-              </Link>
+              <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} />
             ))}
           </div>
         </div>
@@ -161,5 +157,17 @@ export default function Home() {
         </div>
       </section>
     </>
+  );
+}
+
+function CategoryTile({ category, Icon }) {
+  return (
+    <Link to={`/shop?category=${encodeURIComponent(category)}`} className="group rounded-[28px] bg-vellum p-6 shadow-soft transition hover:-translate-y-1 dark:bg-[#211915]">
+      <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-clay/10 text-clay">
+        <Icon size={21} />
+      </div>
+      <h3 className="font-display text-xl font-bold">{category}</h3>
+      <p className="mt-3 text-sm leading-6 text-ink/60 dark:text-vellum/60">Explore handmade details for meaningful gifting.</p>
+    </Link>
   );
 }
