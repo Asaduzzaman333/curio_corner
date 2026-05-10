@@ -21,7 +21,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
-      if (!window.location.pathname.includes("/admin")) {
+      if (window.location.pathname !== "/admin") {
         window.location.href = "/admin";
       }
     }
