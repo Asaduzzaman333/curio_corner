@@ -1,0 +1,31 @@
+{
+  "name": "@mahin/admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5174",
+    "build": "npm install vite@4.5.5 rollup@3.30.0 @vitejs/plugin-react@4.3.4 --no-save --package-lock=false --no-audit --prefer-online && node scripts/build-vite.cjs",
+    "vercel-build": "npx --yes vite@4.5.5 build",
+    "preview": "vite preview --host 0.0.0.0 --port 4174"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "axios": "^1.7.9",
+    "framer-motion": "^11.18.2",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.5.1",
+    "react-router-dom": "^7.1.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "4.5.5"
+  }
+}

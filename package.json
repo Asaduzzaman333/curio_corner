@@ -1,0 +1,31 @@
+{
+  "name": "mahin-handmade-commerce",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Premium handmade crafts eCommerce platform with public storefront and secure admin dashboard.",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend install --package-lock=false --prefer-online --no-audit && npm --prefix frontend run vercel-build",
+    "build:all": "npm --prefix frontend run vercel-build && npm --prefix admin run vercel-build",
+    "seed:admin": "npm --prefix backend run seed:admin"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "rollup": "3.30.0",
+    "vite": "4.5.5"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.5.0",
+    "browserslist": "^4.28.2",
+    "caniuse-lite": "^1.0.30001792"
+  },
+  "overrides": {
+    "rollup": "3.30.0",
+    "vite": "4.5.5"
+  }
+}
