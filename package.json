@@ -19,13 +19,18 @@
     "build:all": "npm --workspace frontend run build && npm --workspace admin run build",
     "seed:admin": "npm --workspace backend run seed:admin"
   },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "rollup": "3.30.0",
+    "vite": "4.5.5"
+  },
   "dependencies": {
     "autoprefixer": "^10.5.0",
     "browserslist": "^4.28.2",
     "caniuse-lite": "^1.0.30001792"
   },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.60.3",
-    "@rollup/rollup-linux-x64-musl": "4.60.3"
+  "overrides": {
+    "rollup": "3.30.0",
+    "vite": "4.5.5"
   }
 }
