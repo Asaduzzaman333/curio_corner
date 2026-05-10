@@ -10,7 +10,7 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:admin": "npm --prefix admin run dev",
     "dev:backend": "npm --prefix backend run dev",
-    "build": "npm --prefix frontend install --package-lock=false --prefer-online --no-audit && npm --prefix admin install --package-lock=false --prefer-online --no-audit && npm --prefix frontend run vercel-build && npm --prefix admin run vercel-build && node scripts/copy-admin.cjs",
+    "build": "npm --prefix backend install --package-lock=false --prefer-online --no-audit && npm --prefix frontend install --package-lock=false --prefer-online --no-audit && npm --prefix admin install --package-lock=false --prefer-online --no-audit && npm --prefix frontend run vercel-build && npm --prefix admin run vercel-build && node scripts/copy-admin.cjs",
     "build:all": "npm --prefix frontend run vercel-build && npm --prefix admin run vercel-build && node scripts/copy-admin.cjs",
     "seed:admin": "npm --prefix backend run seed:admin"
   },
