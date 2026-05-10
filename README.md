@@ -40,9 +40,18 @@ Production-ready handmade crafts eCommerce platform with a public storefront, se
 
 ## Deployment
 
-- Deploy `frontend/` to Vercel as the public website.
-- Deploy `admin/` to Vercel as the private admin app or under a protected domain.
-- Deploy `backend/` to Vercel Serverless Functions or a persistent Node host.
+- Public storefront from repo root on Vercel:
+  - Build command: `npm --workspace frontend run build`
+  - Output directory: `frontend/dist`
+  - The root `vercel.json` already sets these values.
+- Admin panel as a separate Vercel project:
+  - Root directory: `admin`
+  - Build command: `npm run build`
+  - Output directory: `dist`
+  - Login route: `/admin`
+- Backend as a separate Vercel project or Node host:
+  - Root directory: `backend`
+  - Set all values from `backend/.env.example` in Vercel Environment Variables.
 - Set `VITE_API_URL` in both frontend/admin deployments to your backend URL.
 
 ## Security Notes

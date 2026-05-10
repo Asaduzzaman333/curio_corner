@@ -12,7 +12,8 @@
     "dev:frontend": "npm --workspace frontend run dev",
     "dev:admin": "npm --workspace admin run dev",
     "dev:backend": "npm --workspace backend run dev",
-    "build": "npm --workspace frontend run build && npm --workspace admin run build",
+    "build": "npm --workspace frontend run build",
+    "build:all": "npm --workspace frontend run build && npm --workspace admin run build",
     "seed:admin": "npm --workspace backend run seed:admin"
   },
   "dependencies": {
