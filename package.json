@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Premium handmade crafts eCommerce platform with public storefront and secure admin dashboard.",
+  "engines": {
+    "node": "22.x"
+  },
   "workspaces": [
     "frontend",
     "admin",
@@ -20,5 +23,9 @@
     "autoprefixer": "^10.5.0",
     "browserslist": "^4.28.2",
     "caniuse-lite": "^1.0.30001792"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.60.3",
+    "@rollup/rollup-linux-x64-musl": "4.60.3"
   }
 }
