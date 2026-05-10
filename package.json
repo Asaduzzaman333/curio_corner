@@ -6,18 +6,13 @@
   "engines": {
     "node": "22.x"
   },
-  "workspaces": [
-    "frontend",
-    "admin",
-    "backend"
-  ],
   "scripts": {
-    "dev:frontend": "npm --workspace frontend run dev",
-    "dev:admin": "npm --workspace admin run dev",
-    "dev:backend": "npm --workspace backend run dev",
-    "build": "npm --workspace frontend run build",
-    "build:all": "npm --workspace frontend run build && npm --workspace admin run build",
-    "seed:admin": "npm --workspace backend run seed:admin"
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend install --package-lock=false --prefer-online --no-audit && npm --prefix frontend run vercel-build",
+    "build:all": "npm --prefix frontend run vercel-build && npm --prefix admin run vercel-build",
+    "seed:admin": "npm --prefix backend run seed:admin"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "4.3.4",
