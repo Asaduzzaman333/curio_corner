@@ -55,7 +55,7 @@ export default function Home() {
             <p className="mb-4 inline-flex rounded-full border border-clay/25 bg-vellum/75 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-clay backdrop-blur sm:mb-5 sm:text-xs sm:tracking-[0.28em]">
               Premium paper craft studio
             </p>
-            <h1 className="font-display text-[3.25rem] font-extrabold leading-[0.92] sm:text-7xl lg:text-8xl">{settings.homepage?.headline}</h1>
+            <h1 className="font-display text-[2.7rem] font-extrabold leading-[0.96] min-[390px]:text-[2.95rem] sm:text-6xl sm:leading-[0.94] lg:text-7xl xl:text-[5rem]">{settings.homepage?.headline}</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-ink/75 dark:text-vellum/75 sm:mt-6 sm:text-lg sm:leading-8">{settings.homepage?.subheadline}</p>
             <div className="mt-7 flex flex-wrap gap-3 sm:mt-8 sm:gap-4">
               <Link to="/shop" className="focus-ring inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-vellum shadow-lift transition hover:bg-clay sm:flex-none sm:px-6 sm:text-base">
