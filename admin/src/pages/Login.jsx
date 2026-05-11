@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import { enablePushNotifications } from "../utils/pushNotifications.js";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,14 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
+      try {
+        const pushResult = await enablePushNotifications();
+        if (pushResult.subscribed) {
+          toast.success("Phone notifications enabled");
+        }
+      } catch (pushError) {
+        console.error("Could not auto-enable phone notifications", pushError);
+      }
       toast.success("Welcome back");
       navigate("/");
     } catch (error) {

@@ -2,6 +2,7 @@ import { api } from "./api.js";
 
 const getServiceWorkerUrl = () => `${import.meta.env.BASE_URL}sw.js`;
 const getServiceWorkerScope = () => import.meta.env.BASE_URL;
+let enablePushPromise = null;
 
 const urlBase64ToUint8Array = (base64String) => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -30,7 +31,7 @@ export const registerAdminServiceWorker = async () => {
   return navigator.serviceWorker.register(getServiceWorkerUrl(), { scope: getServiceWorkerScope() });
 };
 
-export const enablePushNotifications = async () => {
+const runEnablePushNotifications = async () => {
   if (getPushSupportStatus() === "unsupported") {
     throw new Error("This browser does not support push notifications.");
   }
@@ -55,6 +56,16 @@ export const enablePushNotifications = async () => {
 
   await api.post("/push/subscriptions", { subscription: subscription.toJSON() });
   return { permission, subscribed: true };
+};
+
+export const enablePushNotifications = async () => {
+  if (!enablePushPromise) {
+    enablePushPromise = runEnablePushNotifications().finally(() => {
+      enablePushPromise = null;
+    });
+  }
+
+  return enablePushPromise;
 };
 
 export const disablePushNotifications = async () => {

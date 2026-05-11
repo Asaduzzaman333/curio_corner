@@ -158,9 +158,11 @@ export default function AdminLayout() {
         if (!mounted) return;
         setPushSubscribed(Boolean(existingSubscription));
 
-        if (permission === "granted" && !existingSubscription) {
+        if (permission !== "denied" && permission !== "unsupported" && !existingSubscription) {
           const result = await enablePushNotifications();
-          if (mounted) setPushSubscribed(Boolean(result.subscribed));
+          if (!mounted) return;
+          setNotificationPermission(result.permission);
+          setPushSubscribed(Boolean(result.subscribed));
         }
       })
       .catch((error) => {
@@ -171,23 +173,6 @@ export default function AdminLayout() {
       mounted = false;
     };
   }, [admin]);
-
-  const requestDeviceNotifications = async () => {
-    try {
-      const result = await enablePushNotifications();
-      setNotificationPermission(result.permission);
-      setPushSubscribed(Boolean(result.subscribed));
-
-      if (result.subscribed) {
-        toast.success("Phone notifications enabled.");
-      } else if (result.permission === "denied") {
-        toast.error("Notification permission is blocked in this browser.");
-      }
-    } catch (error) {
-      setNotificationPermission(getNotificationPermission());
-      toast.error(error.message || "Could not enable phone notifications.");
-    }
-  };
 
   const disableDeviceNotifications = async () => {
     try {
@@ -290,15 +275,6 @@ export default function AdminLayout() {
                     <p className="text-xs text-vellum/45">{notificationStatus}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {!pushSubscribed && notificationPermission !== "denied" && notificationPermission !== "unsupported" && (
-                      <button
-                        type="button"
-                        onClick={requestDeviceNotifications}
-                        className="rounded-full bg-clay px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rosewood"
-                      >
-                        Enable
-                      </button>
-                    )}
                     {pushSubscribed && (
                       <button
                         type="button"
