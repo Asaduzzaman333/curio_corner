@@ -33,11 +33,11 @@ export default function Home() {
 
   return (
     <>
-      <section className="relative min-h-[92vh] overflow-hidden px-5 pb-20 pt-28">
+      <section className="relative overflow-hidden px-5 pb-14 pt-24 sm:pb-20 sm:pt-28 lg:min-h-[92vh]">
         <div className="absolute inset-0">
-          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="h-full w-full scale-105 object-cover blur-2xl" />
-          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="absolute inset-0 h-full w-full object-contain object-center" />
-          <div className="absolute inset-0 bg-gradient-to-br from-paper/95 via-paper/72 to-ink/35 dark:from-[#17120f]/92 dark:via-[#17120f]/72 dark:to-black/55" />
+          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="h-full w-full scale-110 object-cover opacity-50 blur-2xl sm:opacity-70" />
+          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="absolute inset-0 hidden h-full w-full object-contain object-center opacity-90 md:block" />
+          <div className="absolute inset-0 bg-gradient-to-b from-paper/98 via-paper/86 to-paper/92 dark:from-[#17120f]/96 dark:via-[#17120f]/84 dark:to-[#17120f]/96 md:bg-gradient-to-br md:from-paper/95 md:via-paper/72 md:to-ink/35 md:dark:from-[#17120f]/92 md:dark:via-[#17120f]/72 md:dark:to-black/55" />
         </div>
         <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute right-[8%] top-32 hidden rounded-full bg-vellum/80 p-5 shadow-soft md:block">
           <Sparkles className="text-gold" />
@@ -45,27 +45,27 @@ export default function Home() {
         <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 8, repeat: Infinity }} className="absolute bottom-24 left-[7%] hidden rounded-full bg-vellum/75 p-4 shadow-soft sm:block">
           <Heart className="text-rosewood" />
         </motion.div>
-        <div className="relative z-10 mx-auto grid max-w-7xl items-end gap-10 lg:min-h-[70vh] lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative z-10 mx-auto grid max-w-7xl items-end gap-8 sm:gap-10 lg:min-h-[70vh] lg:grid-cols-[1.05fr_0.95fr]">
           <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
-            <p className="mb-5 inline-flex rounded-full border border-clay/25 bg-vellum/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] text-clay backdrop-blur">
+            <p className="mb-4 inline-flex rounded-full border border-clay/25 bg-vellum/75 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.24em] text-clay backdrop-blur sm:mb-5 sm:text-xs sm:tracking-[0.28em]">
               Premium paper craft studio
             </p>
-            <h1 className="font-display text-5xl font-extrabold leading-[0.98] sm:text-7xl lg:text-8xl">{settings.homepage?.headline}</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-ink/75 dark:text-vellum/75">{settings.homepage?.subheadline}</p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link to="/shop" className="focus-ring inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay">
+            <h1 className="font-display text-[3.25rem] font-extrabold leading-[0.92] sm:text-7xl lg:text-8xl">{settings.homepage?.headline}</h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-ink/75 dark:text-vellum/75 sm:mt-6 sm:text-lg sm:leading-8">{settings.homepage?.subheadline}</p>
+            <div className="mt-7 flex flex-wrap gap-3 sm:mt-8 sm:gap-4">
+              <Link to="/shop" className="focus-ring inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-vellum shadow-lift transition hover:bg-clay sm:flex-none sm:px-6 sm:text-base">
                 {settings.homepage?.ctaLabel || "Explore Collection"} <ArrowRight size={18} />
               </Link>
-              <a href="#contact" className="focus-ring inline-flex items-center gap-2 rounded-full border border-ink/15 bg-vellum/70 px-6 py-3 font-semibold backdrop-blur transition hover:border-clay hover:text-clay dark:border-white/15">
+              <a href="#contact" className="focus-ring inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-ink/15 bg-vellum/80 px-5 py-3 text-sm font-semibold backdrop-blur transition hover:border-clay hover:text-clay dark:border-white/15 sm:flex-none sm:px-6 sm:text-base">
                 Custom Order
               </a>
             </div>
           </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }} className="glass rounded-[36px] p-5 shadow-soft">
-            <div className="grid grid-cols-3 gap-3">
+          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }} className="glass rounded-[28px] p-3 shadow-soft sm:rounded-[36px] sm:p-5">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {products.slice(0, 3).map((product, index) => (
-                <Link key={product._id} to={`/products/${product.slug}`} className={`${index === 1 ? "mt-10" : ""} overflow-hidden rounded-[28px] shadow-soft`}>
-                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
+                <Link key={product._id} to={`/products/${product.slug}`} className={`${index === 1 ? "mt-8 sm:mt-10" : ""} overflow-hidden rounded-[22px] bg-white shadow-soft sm:rounded-[28px]`}>
+                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[3/4] h-full w-full object-contain transition duration-700 hover:scale-105" />
                 </Link>
               ))}
             </div>
