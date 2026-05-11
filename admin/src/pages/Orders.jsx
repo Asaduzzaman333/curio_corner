@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
 import { api } from "../utils/api.js";
@@ -8,10 +8,13 @@ const statuses = ["pending", "confirmed", "crafting", "ready", "delivered", "can
 export default function Orders() {
   const [orders, setOrders] = useState([]);
 
-  const load = () => api.get("/orders").then(({ data }) => setOrders(data.items || [])).catch(() => setOrders([]));
+  const load = useCallback(() => api.get("/orders").then(({ data }) => setOrders(data.items || [])).catch(() => setOrders([])), []);
+
   useEffect(() => {
     load();
-  }, []);
+    window.addEventListener("admin:new-orders", load);
+    return () => window.removeEventListener("admin:new-orders", load);
+  }, [load]);
 
   const updateStatus = async (id, status) => {
     await api.patch(`/orders/${id}/status`, { status });

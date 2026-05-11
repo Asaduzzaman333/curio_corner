@@ -95,6 +95,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <SectionTitle eyebrow={sections.featured?.eyebrow} title={sections.featured?.title} body={sections.featured?.body} />
           {loading ? <SkeletonGrid /> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{featured.map((product) => <ProductCard key={product._id} product={product} />)}</div>}
+          <div className="mt-8 flex justify-center">
+            <Link to="/shop?featured=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+              See all featured <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -134,6 +139,11 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <SectionTitle eyebrow={sections.trending?.eyebrow} title={sections.trending?.title} body={sections.trending?.body} />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{(trending.length ? trending : products.slice(0, 4)).map((product) => <ProductCard key={product._id} product={product} />)}</div>
+          <div className="mt-8 flex justify-center">
+            <Link to="/shop?trending=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+              See all trending <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
 

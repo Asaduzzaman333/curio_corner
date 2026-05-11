@@ -1,26 +1,12 @@
 import "dotenv/config";
 import dns from "node:dns";
 import bcryptjs from "bcryptjs";
-import { createServer } from "node:http";
-import { Server as SocketIOServer } from "socket.io";
 import { app } from "./app.js";
 import { connectDB } from "./config/db.js";
 import { AdminUser } from "./models/AdminUser.js";
 
 const port = process.env.PORT || 5000;
 let adminBootstrapPromise;
-
-// Create HTTP server
-const httpServer = createServer(app);
-
-// Initialize Socket.IO
-export const io = new SocketIOServer(httpServer, {
-  cors: {
-    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL].filter(Boolean),
-    credentials: true
-  },
-  transports: ["websocket", "polling"]
-});
 
 if (process.env.NODE_ENV !== "production") {
   const dnsServers = process.env.DNS_SERVERS?.split(",").map((server) => server.trim()).filter(Boolean) || [
@@ -58,7 +44,7 @@ if (!process.env.VERCEL) {
   connectDB()
     .then(ensureDefaultAdmin)
     .then(() => {
-      httpServer.listen(port, () => {
+      app.listen(port, () => {
         console.log(`API running on port ${port}`);
       });
     })

@@ -13,12 +13,27 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get("search") || "");
   const category = params.get("category") || "All";
+  const featuredOnly = params.get("featured") === "true";
+  const trendingOnly = params.get("trending") === "true";
+
+  const clearCollectionFilter = (next) => {
+    next.delete("featured");
+    next.delete("trending");
+  };
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     api
-      .get("/products", { params: { search: params.get("search") || undefined, category: category === "All" ? undefined : category } })
+      .get("/products", {
+        params: {
+          search: params.get("search") || undefined,
+          category: category === "All" ? undefined : category,
+          featured: featuredOnly ? "true" : undefined,
+          trending: trendingOnly ? "true" : undefined,
+          limit: featuredOnly || trendingOnly ? 60 : 24
+        }
+      })
       .then(({ data }) => mounted && setProducts(data.items?.length ? data.items : fallbackProducts))
       .catch(() => mounted && setProducts(fallbackProducts))
       .finally(() => mounted && setLoading(false));
@@ -41,10 +56,12 @@ export default function Shop() {
   const shown = useMemo(() => {
     return products.filter((product) => {
       const categoryMatch = category === "All" || product.category === category;
+      const featuredMatch = !featuredOnly || product.isFeatured;
+      const trendingMatch = !trendingOnly || product.isTrending;
       const searchMatch = !search || `${product.name} ${product.description}`.toLowerCase().includes(search.toLowerCase());
-      return categoryMatch && searchMatch;
+      return categoryMatch && featuredMatch && trendingMatch && searchMatch;
     });
-  }, [products, category, search]);
+  }, [products, category, featuredOnly, trendingOnly, search]);
 
   const submitSearch = (event) => {
     event.preventDefault();
@@ -60,7 +77,9 @@ export default function Shop() {
         <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_420px] lg:items-end">
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-clay">Shop</p>
-            <h1 className="font-display text-5xl font-bold">Handmade collection</h1>
+            <h1 className="font-display text-5xl font-bold">
+              {featuredOnly ? "Featured pieces" : trendingOnly ? "Trending pieces" : "Handmade collection"}
+            </h1>
             <p className="mt-4 max-w-2xl leading-7 text-ink/65 dark:text-vellum/65">Search, filter, and choose gifts crafted for emotion, texture, and memory.</p>
           </div>
           <form onSubmit={submitSearch} className="glass flex rounded-full p-2">
@@ -77,13 +96,38 @@ export default function Shop() {
               onClick={() => {
                 const next = new URLSearchParams(params);
                 item === "All" ? next.delete("category") : next.set("category", item);
+                clearCollectionFilter(next);
                 setParams(next);
               }}
-              className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition ${category === item ? "bg-ink text-vellum dark:bg-vellum dark:text-ink" : "bg-vellum text-ink/70 hover:text-clay dark:bg-white/10 dark:text-vellum/70"}`}
+              className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition ${!featuredOnly && !trendingOnly && category === item ? "bg-ink text-vellum dark:bg-vellum dark:text-ink" : "bg-vellum text-ink/70 hover:text-clay dark:bg-white/10 dark:text-vellum/70"}`}
             >
               {item}
             </button>
           ))}
+          <button
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.delete("category");
+              next.delete("trending");
+              next.set("featured", "true");
+              setParams(next);
+            }}
+            className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition ${featuredOnly ? "bg-ink text-vellum dark:bg-vellum dark:text-ink" : "bg-vellum text-ink/70 hover:text-clay dark:bg-white/10 dark:text-vellum/70"}`}
+          >
+            Featured
+          </button>
+          <button
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.delete("category");
+              next.delete("featured");
+              next.set("trending", "true");
+              setParams(next);
+            }}
+            className={`whitespace-nowrap rounded-full px-5 py-2 text-sm font-semibold transition ${trendingOnly ? "bg-ink text-vellum dark:bg-vellum dark:text-ink" : "bg-vellum text-ink/70 hover:text-clay dark:bg-white/10 dark:text-vellum/70"}`}
+          >
+            Trending
+          </button>
         </div>
         {loading ? (
           <SkeletonGrid />
