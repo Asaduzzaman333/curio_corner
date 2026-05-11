@@ -1,4 +1,4 @@
-import { Edit3, Plus, Trash2 } from "lucide-react";
+import { Edit3, Plus, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
@@ -22,16 +22,25 @@ const initialForm = {
 
 const categories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Craft Items", "Customized Gifts"];
 
+const parseImageUrls = (text) =>
+  text
+    .split("\n")
+    .map((url) => url.trim())
+    .filter(Boolean);
+
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   const load = () => api.get("/products/admin/all").then(({ data }) => setProducts(data.items || [])).catch(() => setProducts([]));
   useEffect(() => {
     load();
   }, []);
+
+  const imageUrls = useMemo(() => parseImageUrls(form.imagesText), [form.imagesText]);
 
   const payload = useMemo(() => ({
     name: form.name,
@@ -39,11 +48,7 @@ export default function Products() {
     category: form.category,
     price: Number(form.price),
     discountPrice: form.discountPrice ? Number(form.discountPrice) : undefined,
-    images: form.imagesText
-      .split("\n")
-      .map((url) => url.trim())
-      .filter(Boolean)
-      .map((url) => ({ url })),
+    images: imageUrls.map((url) => ({ url, alt: form.name })),
     videoUrl: form.videoUrl,
     stockStatus: form.stockStatus,
     tags: form.tagsText.split(",").map((tag) => tag.trim()).filter(Boolean),
@@ -51,7 +56,37 @@ export default function Products() {
     isTrending: form.isTrending,
     isPublished: form.isPublished,
     isEnabled: form.isEnabled
-  }), [form]);
+  }), [form, imageUrls]);
+
+  const removeImage = (urlToRemove) => {
+    setForm((current) => ({
+      ...current,
+      imagesText: parseImageUrls(current.imagesText).filter((url) => url !== urlToRemove).join("\n")
+    }));
+  };
+
+  const uploadImages = async (files) => {
+    const selected = Array.from(files || []);
+    if (!selected.length) return;
+
+    const formData = new FormData();
+    selected.forEach((file) => formData.append("images", file));
+    setUploadingImages(true);
+
+    try {
+      const { data } = await api.post("/media", formData, { headers: { "Content-Type": "multipart/form-data" } });
+      const uploadedUrls = (data.items || []).map((item) => item.url).filter(Boolean);
+      setForm((current) => {
+        const merged = [...parseImageUrls(current.imagesText), ...uploadedUrls];
+        return { ...current, imagesText: [...new Set(merged)].join("\n") };
+      });
+      toast.success(`${uploadedUrls.length} product photo${uploadedUrls.length === 1 ? "" : "s"} added`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Photo upload failed");
+    } finally {
+      setUploadingImages(false);
+    }
+  };
 
   const save = async (event) => {
     event.preventDefault();
@@ -121,7 +156,29 @@ export default function Products() {
             </select>
             <input className="input" placeholder="Video URL" value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} />
             <textarea className="input lg:col-span-2" rows="4" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
-            <textarea className="input lg:col-span-2" rows="4" placeholder="Image URLs, one per line. Use Media Manager uploads here." value={form.imagesText} onChange={(e) => setForm({ ...form, imagesText: e.target.value })} />
+            <div className="lg:col-span-2">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                <label className="text-sm text-vellum/60">Product photos</label>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
+                  <Upload size={16} /> {uploadingImages ? "Uploading..." : "Upload Photos"}
+                  <input type="file" accept="image/*" multiple className="hidden" disabled={uploadingImages} onChange={(e) => uploadImages(e.target.files)} />
+                </label>
+              </div>
+              <textarea className="input" rows="4" placeholder="Image URLs, one per line. You can also upload multiple photos above." value={form.imagesText} onChange={(e) => setForm({ ...form, imagesText: e.target.value })} />
+              {imageUrls.length > 0 && (
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                  {imageUrls.map((url, index) => (
+                    <div key={url} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                      <img src={url} alt={`${form.name || "Product"} ${index + 1}`} className="aspect-square w-full object-cover" />
+                      <button type="button" onClick={() => removeImage(url)} className="absolute right-2 top-2 rounded-full bg-rosewood p-2 text-white shadow-lift">
+                        <Trash2 size={14} />
+                      </button>
+                      {index === 0 && <span className="absolute bottom-2 left-2 rounded-full bg-ink/80 px-2 py-1 text-[10px] font-semibold text-vellum">Main</span>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <input className="input lg:col-span-2" placeholder="Tags, comma separated" value={form.tagsText} onChange={(e) => setForm({ ...form, tagsText: e.target.value })} />
           </div>
           <div className="mt-4 flex flex-wrap gap-4">

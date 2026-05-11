@@ -8,6 +8,7 @@ const fallback = {
   brandName: "Curio Corner",
   logo: { url: "/assets/logo.jpg" },
   cover: { url: "/assets/cover.jpg" },
+  aboutImage: { url: "/assets/cover.jpg" },
   homepage: { headline: "", subheadline: "", ctaLabel: "" },
   about: { title: "", body: "" },
   contact: { phone: "", email: "", address: "" },
@@ -80,7 +81,7 @@ export default function Content() {
       <form onSubmit={save} className="grid gap-5">
         <section className="admin-card rounded-[28px] p-5">
           <h2 className="font-display text-2xl font-bold">Brand assets</h2>
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
             <div>
               <label className="mb-2 block text-sm text-vellum/60">Logo URL</label>
               <div className="flex gap-2">
@@ -104,6 +105,18 @@ export default function Content() {
                 <button type="button" onClick={() => deleteAsset("cover")} className="rounded-2xl bg-rosewood px-4"><Trash2 size={17} /></button>
               </div>
               <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="mt-3 h-28 w-full rounded-2xl object-cover" />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm text-vellum/60">About Image URL</label>
+              <div className="flex gap-2">
+                <input className="input" value={settings.aboutImage?.url || ""} onChange={(e) => setSettings({ ...settings, aboutImage: { url: e.target.value } })} placeholder="Paste uploaded about image URL" />
+                <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">
+                  <Upload size={17} />
+                  <input type="file" accept="image/*" className="hidden" disabled={uploading === "aboutImage"} onChange={(e) => uploadAsset("aboutImage", e.target.files?.[0])} />
+                </label>
+                <button type="button" onClick={() => deleteAsset("aboutImage")} className="rounded-2xl bg-rosewood px-4"><Trash2 size={17} /></button>
+              </div>
+              <img src={settings.aboutImage?.url || "/assets/cover.jpg"} alt="" className="mt-3 h-28 w-full rounded-2xl object-cover" />
             </div>
           </div>
         </section>

@@ -14,6 +14,7 @@ const siteSettingsSchema = new mongoose.Schema(
     brandName: { type: String, default: "Curio Corner" },
     logo: { url: { type: String, default: "/assets/logo.jpg" }, publicId: String },
     cover: { url: { type: String, default: "/assets/cover.jpg" }, publicId: String },
+    aboutImage: { url: { type: String, default: "/assets/cover.jpg" }, publicId: String },
     about: {
       title: { type: String, default: "Crafted for moments that deserve feeling" },
       body: {

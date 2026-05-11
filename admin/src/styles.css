@@ -26,10 +26,20 @@ body {
   border-radius: 18px;
   border: 1px solid rgba(255, 249, 240, 0.12);
   background: rgba(255, 249, 240, 0.06);
+  color: #fff9f0;
   padding: 0.8rem 1rem;
   outline: none;
 }
 
 .input:focus {
   border-color: #b66d4e;
+}
+
+select.input {
+  color-scheme: dark;
+}
+
+select.input option {
+  background: #211915;
+  color: #fff9f0;
 }

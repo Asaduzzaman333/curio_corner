@@ -99,7 +99,7 @@ export default function Home() {
       <section className="px-5 py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="overflow-hidden rounded-[36px] shadow-soft">
-            <img src={settings.cover?.url || "/assets/cover.jpg"} alt="Handmade craft table" loading="lazy" className="aspect-[4/5] w-full object-cover" />
+            <img src={settings.aboutImage?.url || settings.cover?.url || "/assets/cover.jpg"} alt="Handmade craft table" loading="lazy" className="aspect-[4/5] w-full object-cover" />
           </div>
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-clay">About the brand</p>
@@ -127,11 +127,11 @@ export default function Home() {
       <section className="px-5 py-20">
         <div className="mx-auto max-w-7xl">
           <SectionTitle eyebrow="Gallery" title="A softer way to gift" />
-          <div className="grid auto-rows-[180px] gap-4 md:grid-cols-4">
-            {products.slice(0, 6).map((product, index) => (
-              <div key={product._id} className={`${index === 0 || index === 5 ? "md:row-span-2" : ""} overflow-hidden rounded-[28px] shadow-soft`}>
-                <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} loading="lazy" className="h-full w-full object-cover transition duration-700 hover:scale-105" />
-              </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {products.slice(0, 6).map((product) => (
+              <Link key={product._id} to={`/products/${product.slug}`} className="group overflow-hidden rounded-[28px] bg-vellum shadow-soft dark:bg-[#211915]">
+                <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-700 hover:scale-105" />
+              </Link>
             ))}
           </div>
         </div>

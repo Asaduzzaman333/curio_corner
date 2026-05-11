@@ -2,6 +2,7 @@ export const fallbackSettings = {
   brandName: "Curio Corner",
   logo: { url: "/assets/logo.jpg" },
   cover: { url: "/assets/cover.jpg" },
+  aboutImage: { url: "/assets/cover.jpg" },
   whatsappNumber: "+8801700000000",
   homepage: {
     headline: "Handmade gifts with a soul",

@@ -77,6 +77,7 @@ export const settingsSchema = z.object({
     brandName: z.string().optional(),
     logo: z.object({ url: z.string(), publicId: z.string().optional() }).optional(),
     cover: z.object({ url: z.string(), publicId: z.string().optional() }).optional(),
+    aboutImage: z.object({ url: z.string(), publicId: z.string().optional() }).optional(),
     about: z.object({ title: z.string().optional(), body: z.string().optional() }).optional(),
     contact: z.object({ phone: z.string().optional(), email: z.string().optional(), address: z.string().optional() }).optional(),
     whatsappNumber: z.string().optional(),
