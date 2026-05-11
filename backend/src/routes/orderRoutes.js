@@ -6,6 +6,7 @@ import { protectAdmin } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { orderSchema, orderStatusSchema } from "../validators/schemas.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { sendNewOrderPushNotification } from "../utils/pushNotifications.js";
 
 export const orderRoutes = express.Router();
 
@@ -17,6 +18,11 @@ orderRoutes.post(
   asyncHandler(async (req, res) => {
     const subtotal = req.body.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const order = await Order.create({ ...req.body, subtotal });
+    try {
+      await sendNewOrderPushNotification(order);
+    } catch (error) {
+      console.error("Failed to send order push notification", error);
+    }
     res.status(201).json({ message: "Order placed", order });
   })
 );

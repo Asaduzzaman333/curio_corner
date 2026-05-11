@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../utils/api.js";
+import { disablePushNotifications, enablePushNotifications, getPushSupportStatus, registerAdminServiceWorker } from "../utils/pushNotifications.js";
 
 const nav = [
   { label: "Dashboard", to: "/", icon: BarChart3 },
@@ -21,7 +22,7 @@ const canUseDeviceNotifications = () => typeof window !== "undefined" && "Notifi
 
 const getNotificationPermission = () => {
   if (!canUseDeviceNotifications()) return "unsupported";
-  return window.Notification.permission;
+  return getPushSupportStatus();
 };
 
 const getItemCount = (order) => order.items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0;
@@ -55,6 +56,7 @@ export default function AdminLayout() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(getNotificationPermission);
+  const [pushSubscribed, setPushSubscribed] = useState(false);
   const { admin, logout } = useAuth();
   const navigate = useNavigate();
   const checkingNotificationsRef = useRef(false);
@@ -66,26 +68,6 @@ export default function AdminLayout() {
     lastOrderIdRef.current = orderId;
     localStorage.setItem(LAST_ORDER_KEY, orderId);
   }, []);
-
-  const showDeviceNotification = useCallback(
-    (order) => {
-      if (!canUseDeviceNotifications() || window.Notification.permission !== "granted") return;
-
-      const notification = new window.Notification("New order received", {
-        body: `${order.customerName} - ${formatCurrency(order.subtotal)} (${getItemCount(order)} items)`,
-        icon: `${window.location.origin}${import.meta.env.BASE_URL}assets/logo.jpg`,
-        tag: `order-${order._id}`,
-        renotify: true
-      });
-
-      notification.onclick = () => {
-        window.focus();
-        navigate("/orders");
-        notification.close();
-      };
-    },
-    [navigate]
-  );
 
   const addOrderNotifications = useCallback(
     (orders) => {
@@ -100,12 +82,11 @@ export default function AdminLayout() {
 
       orders.forEach((order) => {
         toast.success(`New order from ${order.customerName}`, { duration: 6000 });
-        showDeviceNotification(order);
       });
 
       window.dispatchEvent(new CustomEvent("admin:new-orders", { detail: { orders } }));
     },
-    [showDeviceNotification]
+    []
   );
 
   const checkOrderNotifications = useCallback(async () => {
@@ -163,20 +144,58 @@ export default function AdminLayout() {
     };
   }, [admin, checkOrderNotifications]);
 
+  useEffect(() => {
+    if (!admin) return undefined;
+
+    let mounted = true;
+    registerAdminServiceWorker()
+      .then(async (registration) => {
+        const permission = getPushSupportStatus();
+        if (!mounted) return;
+
+        setNotificationPermission(permission);
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (!mounted) return;
+        setPushSubscribed(Boolean(existingSubscription));
+
+        if (permission === "granted" && !existingSubscription) {
+          const result = await enablePushNotifications();
+          if (mounted) setPushSubscribed(Boolean(result.subscribed));
+        }
+      })
+      .catch((error) => {
+        console.error("Could not initialize push notifications", error);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [admin]);
+
   const requestDeviceNotifications = async () => {
-    if (!canUseDeviceNotifications()) {
-      setNotificationPermission("unsupported");
-      toast.error("This browser does not support device notifications.");
-      return;
+    try {
+      const result = await enablePushNotifications();
+      setNotificationPermission(result.permission);
+      setPushSubscribed(Boolean(result.subscribed));
+
+      if (result.subscribed) {
+        toast.success("Phone notifications enabled.");
+      } else if (result.permission === "denied") {
+        toast.error("Notification permission is blocked in this browser.");
+      }
+    } catch (error) {
+      setNotificationPermission(getNotificationPermission());
+      toast.error(error.message || "Could not enable phone notifications.");
     }
+  };
 
-    const permission = await window.Notification.requestPermission();
-    setNotificationPermission(permission);
-
-    if (permission === "granted") {
-      toast.success("Device notifications enabled.");
-    } else if (permission === "denied") {
-      toast.error("Notification permission is blocked in this browser.");
+  const disableDeviceNotifications = async () => {
+    try {
+      await disablePushNotifications();
+      setPushSubscribed(false);
+      toast.success("Phone notifications disabled.");
+    } catch (error) {
+      toast.error(error.message || "Could not disable phone notifications.");
     }
   };
 
@@ -188,20 +207,26 @@ export default function AdminLayout() {
     setNotifications([]);
   };
 
-  const signOut = () => {
+  const signOut = async () => {
+    try {
+      await disablePushNotifications();
+    } catch (error) {
+      console.error("Could not disable push notifications during logout", error);
+    }
+
     logout();
     navigate("/");
   };
 
-  const NotificationIcon = notificationPermission === "granted" ? BellRing : Bell;
+  const NotificationIcon = pushSubscribed ? BellRing : Bell;
   const notificationStatus =
-    notificationPermission === "granted"
-      ? "Device alerts on"
+    pushSubscribed
+      ? "Phone push on"
       : notificationPermission === "denied"
-        ? "Device alerts blocked"
+        ? "Phone push blocked"
         : notificationPermission === "unsupported"
-          ? "Device alerts unavailable"
-          : "Device alerts off";
+          ? "Phone push unavailable"
+          : "Phone push off";
 
   const Sidebar = () => (
     <aside className="admin-card flex h-full flex-col rounded-[28px] p-4">
@@ -265,13 +290,22 @@ export default function AdminLayout() {
                     <p className="text-xs text-vellum/45">{notificationStatus}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {notificationPermission === "default" && (
+                    {!pushSubscribed && notificationPermission !== "denied" && notificationPermission !== "unsupported" && (
                       <button
                         type="button"
                         onClick={requestDeviceNotifications}
                         className="rounded-full bg-clay px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-rosewood"
                       >
                         Enable
+                      </button>
+                    )}
+                    {pushSubscribed && (
+                      <button
+                        type="button"
+                        onClick={disableDeviceNotifications}
+                        className="rounded-full bg-vellum/10 px-3 py-1.5 text-xs font-semibold text-vellum/75 transition hover:text-vellum"
+                      >
+                        Disable
                       </button>
                     )}
                     {notifications.length > 0 && (

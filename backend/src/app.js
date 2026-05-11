@@ -13,6 +13,7 @@ import { settingsRoutes } from "./routes/settingsRoutes.js";
 import { mediaRoutes } from "./routes/mediaRoutes.js";
 import { dashboardRoutes } from "./routes/dashboardRoutes.js";
 import { categoryRoutes } from "./routes/categoryRoutes.js";
+import { pushRoutes } from "./routes/pushRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 export const app = express();
@@ -67,6 +68,7 @@ app.use("/api/settings", settingsRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/push", pushRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
