@@ -1,4 +1,4 @@
-import { Save, Trash2, Upload } from "lucide-react";
+import { Facebook, Instagram, Save, Trash2, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
@@ -19,7 +19,7 @@ const fallback = {
 
 export default function Content() {
   const [settings, setSettings] = useState(fallback);
-  const [socialText, setSocialText] = useState("");
+  const [socialLinks, setSocialLinks] = useState({ facebook: "", instagram: "" });
   const [testimonialText, setTestimonialText] = useState("");
   const [uploading, setUploading] = useState("");
 
@@ -27,7 +27,10 @@ export default function Content() {
     api.get("/settings").then(({ data }) => {
       const merged = { ...fallback, ...data };
       setSettings(merged);
-      setSocialText((merged.socialLinks || []).map((link) => `${link.label}|${link.url}`).join("\n"));
+      setSocialLinks({
+        facebook: merged.socialLinks?.find((link) => link.label?.toLowerCase() === "facebook")?.url || "",
+        instagram: merged.socialLinks?.find((link) => link.label?.toLowerCase() === "instagram")?.url || ""
+      });
       setTestimonialText((merged.testimonials || []).map((item) => `${item.name}|${item.location || ""}|${item.quote}`).join("\n"));
     });
   }, []);
@@ -36,7 +39,10 @@ export default function Content() {
 
   const save = async (event) => {
     event.preventDefault();
-    const socialLinks = socialText.split("\n").map((line) => line.split("|")).filter((parts) => parts[0] && parts[1]).map(([label, url]) => ({ label: label.trim(), url: url.trim() }));
+    const nextSocialLinks = [
+      { label: "Facebook", url: socialLinks.facebook.trim() },
+      { label: "Instagram", url: socialLinks.instagram.trim() }
+    ].filter((link) => link.url);
     const testimonials = testimonialText
       .split("\n")
       .map((line) => line.split("|"))
@@ -44,7 +50,7 @@ export default function Content() {
       .map(([name, location, quote]) => ({ name: name.trim(), location: location.trim(), quote: quote.trim() }));
 
     try {
-      const { data } = await api.put("/settings", { ...settings, socialLinks, testimonials });
+      const { data } = await api.put("/settings", { ...settings, socialLinks: nextSocialLinks, testimonials });
       setSettings(data);
       toast.success("Website content updated");
     } catch (error) {
@@ -147,7 +153,20 @@ export default function Content() {
           <h2 className="font-display text-2xl font-bold">Testimonials and social</h2>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <textarea className="input" rows="5" value={testimonialText} onChange={(e) => setTestimonialText(e.target.value)} placeholder="One per line: Name|Location|Quote" />
-            <textarea className="input" rows="5" value={socialText} onChange={(e) => setSocialText(e.target.value)} placeholder={"Instagram|https://instagram.com/yourpage\nFacebook|https://facebook.com/yourpage"} />
+            <div className="grid gap-4">
+              <label className="grid gap-2">
+                <span className="flex items-center gap-2 text-sm font-semibold text-vellum/70">
+                  <Facebook size={17} /> Facebook page link
+                </span>
+                <input className="input" value={socialLinks.facebook} onChange={(e) => setSocialLinks({ ...socialLinks, facebook: e.target.value })} placeholder="https://facebook.com/yourpage" />
+              </label>
+              <label className="grid gap-2">
+                <span className="flex items-center gap-2 text-sm font-semibold text-vellum/70">
+                  <Instagram size={17} /> Instagram page link
+                </span>
+                <input className="input" value={socialLinks.instagram} onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })} placeholder="https://instagram.com/yourpage" />
+              </label>
+            </div>
           </div>
         </section>
 

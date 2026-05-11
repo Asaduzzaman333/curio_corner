@@ -24,7 +24,7 @@ export default function Layout() {
   const { count } = useCart();
   const { settings } = useSite();
   const { theme, toggleTheme } = useTheme();
-  const socialLinks = ["Instagram", "Facebook"].map((label) => {
+  const socialLinks = ["Facebook", "Instagram"].map((label) => {
     const configured = settings.socialLinks?.find((link) => link.label?.toLowerCase() === label.toLowerCase());
     return { label, url: configured?.url || "" };
   });
@@ -123,7 +123,7 @@ export default function Layout() {
           </div>
           <div>
             <h3 className="font-semibold">Social</h3>
-            <div className="mt-4 flex flex-wrap gap-3">
+            <div className="mt-4 grid gap-3">
               {socialLinks.map((link) => {
                 const meta = socialMeta[link.label.toLowerCase()];
                 const Icon = meta.Icon;
