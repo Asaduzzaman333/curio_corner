@@ -94,7 +94,7 @@ export default function Layout() {
               </button>
               <div className="mt-8 grid gap-4">
                 {nav.map((item) => (
-                  <Link key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : () => setOpen(false)} className="rounded-2xl px-4 py-3 text-lg font-semibold hover:bg-paper dark:hover:bg-white/10">
+                  <Link key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : () => setOpen(false)} className="rounded-2xl border-2 border-ink/30 px-4 py-3 text-lg font-semibold transition hover:border-clay hover:bg-paper dark:border-white/20 dark:hover:border-clay dark:hover:bg-white/10">
                     {item.label}
                   </Link>
                 ))}
