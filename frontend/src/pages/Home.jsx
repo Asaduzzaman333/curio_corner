@@ -47,8 +47,8 @@ export default function Home() {
         </motion.div>
         <div className="relative z-10 mx-auto grid max-w-7xl items-end gap-8 sm:gap-10 lg:min-h-[70vh] lg:grid-cols-[1.05fr_0.95fr]">
           <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="overflow-hidden rounded-[30px] border border-white/65 bg-vellum/80 p-2 shadow-soft backdrop-blur md:hidden dark:border-white/10 dark:bg-[#211915]/80">
-            <div className="overflow-hidden rounded-[24px] bg-white">
-              <img src={settings.cover?.url || "/assets/cover.jpg"} alt={settings.brandName} className="aspect-[16/10] w-full object-contain" />
+            <div className="overflow-hidden rounded-[24px]">
+              <img src={settings.cover?.url || "/assets/cover.jpg"} alt={settings.brandName} className="block h-auto w-full" />
             </div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
