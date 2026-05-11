@@ -1,14 +1,14 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { BarChart3, Boxes, Image, LogOut, Menu, MessageSquareText, PackageCheck, X } from "lucide-react";
+import { BarChart3, Boxes, LogOut, Menu, MessageSquareText, PackageCheck, Tags, X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 
 const nav = [
   { label: "Dashboard", to: "/", icon: BarChart3 },
   { label: "Products", to: "/products", icon: Boxes },
+  { label: "Categories", to: "/categories", icon: Tags },
   { label: "Orders", to: "/orders", icon: PackageCheck },
-  { label: "Content", to: "/content", icon: MessageSquareText },
-  { label: "Media", to: "/media", icon: Image }
+  { label: "Content", to: "/content", icon: MessageSquareText }
 ];
 
 export default function AdminLayout() {

@@ -9,9 +9,9 @@ import "./styles.css";
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
 const Products = lazy(() => import("./pages/Products.jsx"));
+const Categories = lazy(() => import("./pages/Categories.jsx"));
 const Orders = lazy(() => import("./pages/Orders.jsx"));
 const Content = lazy(() => import("./pages/Content.jsx"));
-const Media = lazy(() => import("./pages/Media.jsx"));
 
 function AdminRoot() {
   const { isAuthenticated } = useAuth();
@@ -27,9 +27,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/" element={<AdminRoot />}>
               <Route index element={<Dashboard />} />
               <Route path="products" element={<Products />} />
+              <Route path="categories" element={<Categories />} />
               <Route path="orders" element={<Orders />} />
               <Route path="content" element={<Content />} />
-              <Route path="media" element={<Media />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

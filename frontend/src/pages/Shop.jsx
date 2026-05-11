@@ -4,11 +4,12 @@ import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard.jsx";
 import SkeletonGrid from "../components/SkeletonGrid.jsx";
 import { api } from "../utils/api.js";
-import { categories, fallbackProducts } from "../data/fallback.js";
+import { categories as fallbackCategories, fallbackProducts } from "../data/fallback.js";
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const [products, setProducts] = useState(fallbackProducts);
+  const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get("search") || "");
   const category = params.get("category") || "All";
@@ -25,6 +26,17 @@ export default function Shop() {
       mounted = false;
     };
   }, [params, category]);
+
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/categories")
+      .then(({ data }) => mounted && setCategoryOptions(data.items?.length ? data.items : fallbackCategories))
+      .catch(() => mounted && setCategoryOptions(fallbackCategories));
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const shown = useMemo(() => {
     return products.filter((product) => {
@@ -59,7 +71,7 @@ export default function Shop() {
           </form>
         </div>
         <div className="mb-8 flex gap-3 overflow-x-auto pb-2">
-          {["All", ...categories].map((item) => (
+          {["All", ...categoryOptions].map((item) => (
             <button
               key={item}
               onClick={() => {

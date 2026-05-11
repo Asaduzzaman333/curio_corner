@@ -20,7 +20,7 @@ const initialForm = {
   isEnabled: true
 };
 
-const categories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Craft Items", "Customized Gifts"];
+const fallbackCategories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Craft Items", "Customized Gifts"];
 
 const parseImageUrls = (text) =>
   text
@@ -34,10 +34,21 @@ export default function Products() {
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
 
   const load = () => api.get("/products/admin/all").then(({ data }) => setProducts(data.items || [])).catch(() => setProducts([]));
+  const loadCategories = () =>
+    api
+      .get("/categories/admin/all")
+      .then(({ data }) => {
+        const names = (data.items || []).filter((item) => item.isEnabled).map((item) => item.name);
+        setCategoryOptions(names.length ? names : fallbackCategories);
+      })
+      .catch(() => setCategoryOptions(fallbackCategories));
+
   useEffect(() => {
     load();
+    loadCategories();
   }, []);
 
   const imageUrls = useMemo(() => parseImageUrls(form.imagesText), [form.imagesText]);
@@ -105,6 +116,9 @@ export default function Products() {
 
   const edit = (product) => {
     setEditing(product._id);
+    if (product.category && !categoryOptions.includes(product.category)) {
+      setCategoryOptions((current) => [...current, product.category]);
+    }
     setForm({
       name: product.name || "",
       description: product.description || "",
@@ -145,7 +159,7 @@ export default function Products() {
         <form onSubmit={save} className="admin-card mb-6 rounded-[28px] p-5 md:p-6">
           <div className="grid gap-4 lg:grid-cols-2">
             <input className="input" placeholder="Product name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-            <select className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>{categories.map((item) => <option key={item}>{item}</option>)}</select>
+            <select className="input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>{categoryOptions.map((item) => <option key={item}>{item}</option>)}</select>
             <input className="input" type="number" placeholder="Price" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required />
             <input className="input" type="number" placeholder="Discount price" value={form.discountPrice} onChange={(e) => setForm({ ...form, discountPrice: e.target.value })} />
             <select className="input" value={form.stockStatus} onChange={(e) => setForm({ ...form, stockStatus: e.target.value })}>

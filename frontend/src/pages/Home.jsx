@@ -7,13 +7,14 @@ import SectionTitle from "../components/SectionTitle.jsx";
 import SkeletonGrid from "../components/SkeletonGrid.jsx";
 import { useSite } from "../context/SiteContext.jsx";
 import { api } from "../utils/api.js";
-import { categories, fallbackProducts } from "../data/fallback.js";
+import { categories as fallbackCategories, fallbackProducts } from "../data/fallback.js";
 
 const categoryIcons = [Gift, Heart, Sparkles, Star, ArrowRight];
 
 export default function Home() {
   const { settings } = useSite();
   const [products, setProducts] = useState(fallbackProducts);
+  const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +24,17 @@ export default function Home() {
       .then(({ data }) => mounted && data.items?.length && setProducts(data.items))
       .catch(() => mounted && setProducts(fallbackProducts))
       .finally(() => mounted && setLoading(false));
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    api
+      .get("/categories")
+      .then(({ data }) => mounted && setCategoryOptions(data.items?.length ? data.items : fallbackCategories))
+      .catch(() => mounted && setCategoryOptions(fallbackCategories));
     return () => {
       mounted = false;
     };
@@ -89,7 +101,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl">
           <SectionTitle eyebrow="Categories" title="Designed around the occasion" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {categories.map((category, index) => (
+            {categoryOptions.map((category, index) => (
               <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} />
             ))}
           </div>
