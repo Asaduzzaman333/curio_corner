@@ -35,7 +35,8 @@ export default function Home() {
     <>
       <section className="relative min-h-[92vh] overflow-hidden px-5 pb-20 pt-28">
         <div className="absolute inset-0">
-          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="h-full w-full object-cover" />
+          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="h-full w-full scale-105 object-cover blur-2xl" />
+          <img src={settings.cover?.url || "/assets/cover.jpg"} alt="" className="absolute inset-0 h-full w-full object-contain object-center" />
           <div className="absolute inset-0 bg-gradient-to-br from-paper/95 via-paper/72 to-ink/35 dark:from-[#17120f]/92 dark:via-[#17120f]/72 dark:to-black/55" />
         </div>
         <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute right-[8%] top-32 hidden rounded-full bg-vellum/80 p-5 shadow-soft md:block">
