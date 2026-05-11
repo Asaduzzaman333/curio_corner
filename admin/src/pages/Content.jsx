@@ -10,12 +10,43 @@ const fallback = {
   cover: { url: "/assets/cover.jpg" },
   aboutImage: { url: "/assets/cover.jpg" },
   homepage: { headline: "", subheadline: "", ctaLabel: "" },
+  sections: {
+    featured: {
+      eyebrow: "Featured",
+      title: "Pieces made to feel personal",
+      body: "Soft textures, careful palettes, and handmade finishing turn simple gifts into keepsakes."
+    },
+    categories: {
+      eyebrow: "Categories",
+      title: "Designed around the occasion",
+      body: "",
+      tileBody: "Explore handmade details for meaningful gifting."
+    },
+    trending: { eyebrow: "Trending", title: "Loved this week", body: "" },
+    gallery: { eyebrow: "Gallery", title: "A softer way to gift", body: "" },
+    contact: { eyebrow: "Custom order", title: "Tell us the feeling. We will shape the gift.", body: "" }
+  },
   about: { title: "", body: "" },
   contact: { phone: "", email: "", address: "" },
   whatsappNumber: "",
   socialLinks: [],
   testimonials: []
 };
+
+const mergeSettings = (data = {}) => ({
+  ...fallback,
+  ...data,
+  homepage: { ...fallback.homepage, ...data.homepage },
+  sections: {
+    featured: { ...fallback.sections.featured, ...data.sections?.featured },
+    categories: { ...fallback.sections.categories, ...data.sections?.categories },
+    trending: { ...fallback.sections.trending, ...data.sections?.trending },
+    gallery: { ...fallback.sections.gallery, ...data.sections?.gallery },
+    contact: { ...fallback.sections.contact, ...data.sections?.contact }
+  },
+  about: { ...fallback.about, ...data.about },
+  contact: { ...fallback.contact, ...data.contact }
+});
 
 export default function Content() {
   const [settings, setSettings] = useState(fallback);
@@ -25,7 +56,7 @@ export default function Content() {
 
   useEffect(() => {
     api.get("/settings").then(({ data }) => {
-      const merged = { ...fallback, ...data };
+      const merged = mergeSettings(data);
       setSettings(merged);
       setSocialLinks({
         facebook: merged.socialLinks?.find((link) => link.label?.toLowerCase() === "facebook")?.url || "",
@@ -36,6 +67,14 @@ export default function Content() {
   }, []);
 
   const setNested = (group, key, value) => setSettings((current) => ({ ...current, [group]: { ...current[group], [key]: value } }));
+  const setSection = (section, key, value) =>
+    setSettings((current) => ({
+      ...current,
+      sections: {
+        ...current.sections,
+        [section]: { ...current.sections?.[section], [key]: value }
+      }
+    }));
 
   const save = async (event) => {
     event.preventDefault();
@@ -51,7 +90,7 @@ export default function Content() {
 
     try {
       const { data } = await api.put("/settings", { ...settings, socialLinks: nextSocialLinks, testimonials });
-      setSettings(data);
+      setSettings(mergeSettings(data));
       toast.success("Website content updated");
     } catch (error) {
       toast.error(error.response?.data?.message || "Could not update content");
@@ -138,6 +177,17 @@ export default function Content() {
         </section>
 
         <section className="admin-card rounded-[28px] p-5">
+          <h2 className="font-display text-2xl font-bold">Homepage sections</h2>
+          <div className="mt-5 grid gap-5">
+            <SectionCopyFields title="Featured section" section={settings.sections?.featured} onChange={(key, value) => setSection("featured", key, value)} />
+            <SectionCopyFields title="Categories section" section={settings.sections?.categories} onChange={(key, value) => setSection("categories", key, value)} showTileBody />
+            <SectionCopyFields title="Trending section" section={settings.sections?.trending} onChange={(key, value) => setSection("trending", key, value)} />
+            <SectionCopyFields title="Gallery section" section={settings.sections?.gallery} onChange={(key, value) => setSection("gallery", key, value)} />
+            <SectionCopyFields title="Contact block" section={settings.sections?.contact} onChange={(key, value) => setSection("contact", key, value)} />
+          </div>
+        </section>
+
+        <section className="admin-card rounded-[28px] p-5">
           <h2 className="font-display text-2xl font-bold">About and contact</h2>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <input className="input lg:col-span-2" value={settings.about?.title || ""} onChange={(e) => setNested("about", "title", e.target.value)} placeholder="About title" />
@@ -174,6 +224,20 @@ export default function Content() {
           <Save size={18} /> Save Content
         </button>
       </form>
+    </div>
+  );
+}
+
+function SectionCopyFields({ title, section = {}, onChange, showTileBody = false }) {
+  return (
+    <div className="rounded-[24px] border border-white/10 p-4">
+      <h3 className="mb-4 font-semibold">{title}</h3>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <input className="input" value={section.eyebrow || ""} onChange={(event) => onChange("eyebrow", event.target.value)} placeholder="Small eyebrow text" />
+        <input className="input" value={section.title || ""} onChange={(event) => onChange("title", event.target.value)} placeholder="Section title" />
+        <textarea className="input lg:col-span-2" rows="2" value={section.body || ""} onChange={(event) => onChange("body", event.target.value)} placeholder="Section subtitle/body text" />
+        {showTileBody && <textarea className="input lg:col-span-2" rows="2" value={section.tileBody || ""} onChange={(event) => onChange("tileBody", event.target.value)} placeholder="Text under each category card" />}
+      </div>
     </div>
   );
 }

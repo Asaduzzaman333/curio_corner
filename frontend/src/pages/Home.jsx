@@ -13,6 +13,7 @@ const categoryIcons = [Gift, Heart, Sparkles, Star, ArrowRight];
 
 export default function Home() {
   const { settings } = useSite();
+  const sections = settings.sections || {};
   const [products, setProducts] = useState(fallbackProducts);
   const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
   const [loading, setLoading] = useState(true);
@@ -92,17 +93,17 @@ export default function Home() {
 
       <section className="px-5 py-12 sm:py-20">
         <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow="Featured" title="Pieces made to feel personal" body="Soft textures, careful palettes, and handmade finishing turn simple gifts into keepsakes." />
+          <SectionTitle eyebrow={sections.featured?.eyebrow} title={sections.featured?.title} body={sections.featured?.body} />
           {loading ? <SkeletonGrid /> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{featured.map((product) => <ProductCard key={product._id} product={product} />)}</div>}
         </div>
       </section>
 
       <section className="paper-texture px-5 py-20">
         <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow="Categories" title="Designed around the occasion" />
+          <SectionTitle eyebrow={sections.categories?.eyebrow} title={sections.categories?.title} body={sections.categories?.body} />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {categoryOptions.map((category, index) => (
-              <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} />
+              <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} body={sections.categories?.tileBody} />
             ))}
           </div>
         </div>
@@ -131,14 +132,14 @@ export default function Home() {
 
       <section className="paper-texture px-5 py-20">
         <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow="Trending" title="Loved this week" />
+          <SectionTitle eyebrow={sections.trending?.eyebrow} title={sections.trending?.title} body={sections.trending?.body} />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{(trending.length ? trending : products.slice(0, 4)).map((product) => <ProductCard key={product._id} product={product} />)}</div>
         </div>
       </section>
 
       <section className="px-5 py-20">
         <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow="Gallery" title="A softer way to gift" />
+          <SectionTitle eyebrow={sections.gallery?.eyebrow} title={sections.gallery?.title} body={sections.gallery?.body} />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.slice(0, 6).map((product) => (
               <Link key={product._id} to={`/products/${product.slug}`} className="group overflow-hidden rounded-[28px] bg-vellum shadow-soft dark:bg-[#211915]">
@@ -164,8 +165,8 @@ export default function Home() {
         <div className="mx-auto max-w-7xl rounded-[36px] bg-ink p-8 text-vellum shadow-lift md:p-12">
           <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-gold">Custom order</p>
-              <h2 className="font-display text-4xl font-bold">Tell us the feeling. We will shape the gift.</h2>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-gold">{sections.contact?.eyebrow}</p>
+              <h2 className="font-display text-4xl font-bold">{sections.contact?.title}</h2>
               <p className="mt-4 max-w-2xl text-vellum/70">{settings.contact?.email} · {settings.contact?.phone}</p>
             </div>
             <a href={`https://wa.me/${(settings.whatsappNumber || "").replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="rounded-full bg-vellum px-6 py-3 text-center font-semibold text-ink transition hover:bg-gold">
@@ -178,14 +179,14 @@ export default function Home() {
   );
 }
 
-function CategoryTile({ category, Icon }) {
+function CategoryTile({ category, Icon, body }) {
   return (
     <Link to={`/shop?category=${encodeURIComponent(category)}`} className="group rounded-[28px] bg-vellum p-6 shadow-soft transition hover:-translate-y-1 dark:bg-[#211915]">
       <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-full bg-clay/10 text-clay">
         <Icon size={21} />
       </div>
       <h3 className="font-display text-xl font-bold">{category}</h3>
-      <p className="mt-3 text-sm leading-6 text-ink/60 dark:text-vellum/60">Explore handmade details for meaningful gifting.</p>
+      {body && <p className="mt-3 text-sm leading-6 text-ink/60 dark:text-vellum/60">{body}</p>}
     </Link>
   );
 }

@@ -9,6 +9,34 @@ export const fallbackSettings = {
     subheadline: "Premium paper crafts, cards, curated gift boxes, and custom keepsakes made for the people you love.",
     ctaLabel: "Explore Collection"
   },
+  sections: {
+    featured: {
+      eyebrow: "Featured",
+      title: "Pieces made to feel personal",
+      body: "Soft textures, careful palettes, and handmade finishing turn simple gifts into keepsakes."
+    },
+    categories: {
+      eyebrow: "Categories",
+      title: "Designed around the occasion",
+      body: "",
+      tileBody: "Explore handmade details for meaningful gifting."
+    },
+    trending: {
+      eyebrow: "Trending",
+      title: "Loved this week",
+      body: ""
+    },
+    gallery: {
+      eyebrow: "Gallery",
+      title: "A softer way to gift",
+      body: ""
+    },
+    contact: {
+      eyebrow: "Custom order",
+      title: "Tell us the feeling. We will shape the gift.",
+      body: ""
+    }
+  },
   about: {
     title: "Crafted for moments that deserve feeling",
     body: "Every card, box, and keepsake is shaped by hand with layered paper, careful color, and a personal story in mind."

@@ -3,6 +3,12 @@ import { z } from "zod";
 const id = z.string().min(12);
 const nonEmpty = z.string().trim().min(1);
 const maybeUrl = z.string().trim().url().or(z.literal("")).optional();
+const sectionTextSchema = z.object({
+  eyebrow: z.string().optional(),
+  title: z.string().optional(),
+  body: z.string().optional(),
+  tileBody: z.string().optional()
+});
 
 export const loginSchema = z.object({
   body: z.object({
@@ -88,6 +94,15 @@ export const settingsSchema = z.object({
         headline: z.string().optional(),
         subheadline: z.string().optional(),
         ctaLabel: z.string().optional()
+      })
+      .optional(),
+    sections: z
+      .object({
+        featured: sectionTextSchema.optional(),
+        categories: sectionTextSchema.optional(),
+        trending: sectionTextSchema.optional(),
+        gallery: sectionTextSchema.optional(),
+        contact: sectionTextSchema.optional()
       })
       .optional()
   })

@@ -10,7 +10,8 @@ const initialForm = {
   category: "Handmade Cards",
   price: "",
   discountPrice: "",
-  imagesText: "",
+  mainImageUrl: "",
+  galleryImagesText: "",
   videoUrl: "",
   stockStatus: "made-to-order",
   tagsText: "handmade, customized",
@@ -33,7 +34,7 @@ export default function Products() {
   const [form, setForm] = useState(initialForm);
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
-  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState("");
   const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
 
   const load = () => api.get("/products/admin/all").then(({ data }) => setProducts(data.items || [])).catch(() => setProducts([]));
@@ -51,7 +52,11 @@ export default function Products() {
     loadCategories();
   }, []);
 
-  const imageUrls = useMemo(() => parseImageUrls(form.imagesText), [form.imagesText]);
+  const galleryImageUrls = useMemo(() => parseImageUrls(form.galleryImagesText), [form.galleryImagesText]);
+  const imageUrls = useMemo(() => {
+    const urls = [form.mainImageUrl.trim(), ...galleryImageUrls].filter(Boolean);
+    return [...new Set(urls)];
+  }, [form.mainImageUrl, galleryImageUrls]);
 
   const payload = useMemo(() => ({
     name: form.name,
@@ -69,33 +74,43 @@ export default function Products() {
     isEnabled: form.isEnabled
   }), [form, imageUrls]);
 
-  const removeImage = (urlToRemove) => {
+  const removeGalleryImage = (urlToRemove) => {
     setForm((current) => ({
       ...current,
-      imagesText: parseImageUrls(current.imagesText).filter((url) => url !== urlToRemove).join("\n")
+      galleryImagesText: parseImageUrls(current.galleryImagesText).filter((url) => url !== urlToRemove).join("\n")
     }));
   };
 
-  const uploadImages = async (files) => {
+  const uploadImages = async (files, target = "gallery") => {
     const selected = Array.from(files || []);
     if (!selected.length) return;
 
     const formData = new FormData();
     selected.forEach((file) => formData.append("images", file));
-    setUploadingImages(true);
+    setUploadingImages(target);
 
     try {
       const { data } = await api.post("/media", formData, { headers: { "Content-Type": "multipart/form-data" } });
       const uploadedUrls = (data.items || []).map((item) => item.url).filter(Boolean);
       setForm((current) => {
-        const merged = [...parseImageUrls(current.imagesText), ...uploadedUrls];
-        return { ...current, imagesText: [...new Set(merged)].join("\n") };
+        if (target === "main") {
+          const [mainUrl, ...extraUrls] = uploadedUrls;
+          const mergedGallery = [...parseImageUrls(current.galleryImagesText), ...extraUrls];
+          return {
+            ...current,
+            mainImageUrl: mainUrl || current.mainImageUrl,
+            galleryImagesText: [...new Set(mergedGallery)].join("\n")
+          };
+        }
+
+        const merged = [...parseImageUrls(current.galleryImagesText), ...uploadedUrls];
+        return { ...current, galleryImagesText: [...new Set(merged)].join("\n") };
       });
       toast.success(`${uploadedUrls.length} product photo${uploadedUrls.length === 1 ? "" : "s"} added`);
     } catch (error) {
       toast.error(error.response?.data?.message || "Photo upload failed");
     } finally {
-      setUploadingImages(false);
+      setUploadingImages("");
     }
   };
 
@@ -125,7 +140,8 @@ export default function Products() {
       category: product.category || "Handmade Cards",
       price: product.price || "",
       discountPrice: product.discountPrice || "",
-      imagesText: product.images?.map((image) => image.url).join("\n") || "",
+      mainImageUrl: product.images?.[0]?.url || "",
+      galleryImagesText: product.images?.slice(1).map((image) => image.url).join("\n") || "",
       videoUrl: product.videoUrl || "",
       stockStatus: product.stockStatus || "made-to-order",
       tagsText: product.tags?.join(", ") || "",
@@ -172,21 +188,43 @@ export default function Products() {
             <textarea className="input lg:col-span-2" rows="4" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
             <div className="lg:col-span-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm text-vellum/60">Product photos</label>
+                <label className="text-sm text-vellum/60">Main product photo</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
-                  <Upload size={16} /> {uploadingImages ? "Uploading..." : "Upload Photos"}
-                  <input type="file" accept="image/*" multiple className="hidden" disabled={uploadingImages} onChange={(e) => uploadImages(e.target.files)} />
+                  <Upload size={16} /> {uploadingImages === "main" ? "Uploading..." : "Upload Main Photo"}
+                  <input type="file" accept="image/*" className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "main")} />
                 </label>
               </div>
-              <textarea className="input" rows="4" placeholder="Image URLs, one per line. You can also upload multiple photos above." value={form.imagesText} onChange={(e) => setForm({ ...form, imagesText: e.target.value })} />
+              <input className="input" placeholder="Main photo URL. This appears on product cards and as first product image." value={form.mainImageUrl} onChange={(e) => setForm({ ...form, mainImageUrl: e.target.value })} />
+              {form.mainImageUrl && (
+                <div className="mt-3 w-40 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                  <img src={form.mainImageUrl} alt={`${form.name || "Product"} main`} className="aspect-square w-full object-cover" />
+                  <div className="px-3 py-2 text-xs font-semibold text-vellum/70">Main photo</div>
+                </div>
+              )}
+            </div>
+            <div className="lg:col-span-2">
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                <label className="text-sm text-vellum/60">Additional gallery photos</label>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
+                  <Upload size={16} /> {uploadingImages === "gallery" ? "Uploading..." : "Upload Gallery Photos"}
+                  <input type="file" accept="image/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
+                </label>
+              </div>
+              <textarea className="input" rows="4" placeholder="Extra product detail/gallery image URLs, one per line." value={form.galleryImagesText} onChange={(e) => setForm({ ...form, galleryImagesText: e.target.value })} />
               {imageUrls.length > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {imageUrls.map((url, index) => (
                     <div key={url} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                       <img src={url} alt={`${form.name || "Product"} ${index + 1}`} className="aspect-square w-full object-cover" />
-                      <button type="button" onClick={() => removeImage(url)} className="absolute right-2 top-2 rounded-full bg-rosewood p-2 text-white shadow-lift">
-                        <Trash2 size={14} />
-                      </button>
+                      {index === 0 ? (
+                        <button type="button" onClick={() => setForm({ ...form, mainImageUrl: "" })} className="absolute right-2 top-2 rounded-full bg-rosewood p-2 text-white shadow-lift">
+                          <Trash2 size={14} />
+                        </button>
+                      ) : (
+                        <button type="button" onClick={() => removeGalleryImage(url)} className="absolute right-2 top-2 rounded-full bg-rosewood p-2 text-white shadow-lift">
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                       {index === 0 && <span className="absolute bottom-2 left-2 rounded-full bg-ink/80 px-2 py-1 text-[10px] font-semibold text-vellum">Main</span>}
                     </div>
                   ))}
