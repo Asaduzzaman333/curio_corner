@@ -147,7 +147,7 @@ export default function Content() {
           <h2 className="font-display text-2xl font-bold">Testimonials and social</h2>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             <textarea className="input" rows="5" value={testimonialText} onChange={(e) => setTestimonialText(e.target.value)} placeholder="One per line: Name|Location|Quote" />
-            <textarea className="input" rows="5" value={socialText} onChange={(e) => setSocialText(e.target.value)} placeholder="One per line: Label|https://url.com" />
+            <textarea className="input" rows="5" value={socialText} onChange={(e) => setSocialText(e.target.value)} placeholder={"Instagram|https://instagram.com/yourpage\nFacebook|https://facebook.com/yourpage"} />
           </div>
         </section>
 

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
-import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
+import { Facebook, Instagram, Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCart } from "../context/CartContext.jsx";
@@ -13,12 +13,21 @@ const nav = [
   { label: "Contact", to: "/#contact" }
 ];
 
+const socialMeta = {
+  instagram: { label: "Instagram", Icon: Instagram },
+  facebook: { label: "Facebook", Icon: Facebook }
+};
+
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const { hash, pathname } = useLocation();
   const { count } = useCart();
   const { settings } = useSite();
   const { theme, toggleTheme } = useTheme();
+  const socialLinks = ["Instagram", "Facebook"].map((label) => {
+    const configured = settings.socialLinks?.find((link) => link.label?.toLowerCase() === label.toLowerCase());
+    return { label, url: configured?.url || "" };
+  });
 
   const isNavActive = (item) => {
     if (item.to === "/") return pathname === "/" && hash !== "#contact";
@@ -115,11 +124,16 @@ export default function Layout() {
           <div>
             <h3 className="font-semibold">Social</h3>
             <div className="mt-4 flex flex-wrap gap-3">
-              {settings.socialLinks?.map((link) => (
-                <a key={link.label} href={link.url} className="rounded-full border border-ink/10 px-4 py-2 text-sm hover:border-clay hover:text-clay dark:border-white/10">
-                  {link.label}
+              {socialLinks.map((link) => {
+                const meta = socialMeta[link.label.toLowerCase()];
+                const Icon = meta.Icon;
+                return (
+                <a key={link.label} href={link.url || undefined} aria-disabled={!link.url} onClick={(event) => !link.url && event.preventDefault()} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 rounded-full border border-ink/10 px-4 py-2 text-sm font-semibold transition dark:border-white/10 ${link.url ? "hover:border-clay hover:text-clay" : "cursor-not-allowed opacity-45"}`}>
+                  <Icon size={17} />
+                  {meta.label}
                 </a>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

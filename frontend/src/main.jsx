@@ -21,10 +21,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider>
       <SiteProvider>
         <CartProvider>
-          <Preloader />
           <BrowserRouter>
+            <Preloader />
             <ScrollToTop />
-            <Suspense fallback={<div className="min-h-screen bg-paper p-8 text-ink">Loading collection...</div>}>
+            <Suspense fallback={<Preloader persistent={false} />}>
               <Routes>
                 <Route element={<Layout />}>
                   <Route path="/" element={<Home />} />
