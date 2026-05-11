@@ -1,16 +1,19 @@
-import { Link, useParams } from "react-router-dom";
-import { PlayCircle, ShoppingBag } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Minus, PackageCheck, PlayCircle, Plus, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext.jsx";
 import { api } from "../utils/api.js";
+import { createDirectOrderItem, saveDirectOrder } from "../utils/directOrder.js";
 import { fallbackProducts } from "../data/fallback.js";
 
 export default function ProductDetails() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const [product, setProduct] = useState(() => fallbackProducts.find((item) => item.slug === slug) || fallbackProducts[0]);
   const [active, setActive] = useState(product.images?.[0]?.url || "/assets/cover.jpg");
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     let mounted = true;
@@ -20,6 +23,7 @@ export default function ProductDetails() {
         if (mounted) {
           setProduct(data);
           setActive(data.images?.[0]?.url || "/assets/cover.jpg");
+          setQuantity(1);
         }
       })
       .catch(() => {
@@ -27,6 +31,7 @@ export default function ProductDetails() {
         if (fallback) {
           setProduct(fallback);
           setActive(fallback.images?.[0]?.url || "/assets/cover.jpg");
+          setQuantity(1);
         } else {
           toast.error("Product unavailable");
         }
@@ -37,6 +42,12 @@ export default function ProductDetails() {
   }, [slug]);
 
   const price = product.discountPrice || product.price;
+  const updateQuantity = (value) => setQuantity(Math.max(1, Number(value) || 1));
+
+  const orderNow = () => {
+    saveDirectOrder(createDirectOrderItem(product, quantity));
+    navigate("/checkout?direct=true");
+  };
 
   return (
     <section className="min-h-screen px-5 pb-24 pt-32">
@@ -65,15 +76,32 @@ export default function ProductDetails() {
             <span className="text-4xl font-bold">৳{price}</span>
             {product.discountPrice && <span className="pb-1 text-lg text-ink/45 line-through dark:text-vellum/45">৳{product.price}</span>}
           </div>
-          <button onClick={() => addItem(product)} className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
-            <ShoppingBag size={19} /> Add to Cart
-          </button>
+          <div className="mt-8 flex items-center justify-between gap-4 rounded-[28px] border border-ink/10 bg-vellum/70 p-4 shadow-soft dark:border-white/10 dark:bg-[#211915]">
+            <span className="text-sm font-semibold text-ink/65 dark:text-vellum/65">Quantity</span>
+            <div className="flex items-center rounded-full border border-ink/10 bg-paper dark:border-white/10 dark:bg-white/5">
+              <button type="button" onClick={() => updateQuantity(quantity - 1)} className="focus-ring rounded-full p-3 text-ink/70 transition hover:text-clay dark:text-vellum/70" aria-label="Decrease quantity">
+                <Minus size={16} />
+              </button>
+              <input type="number" min="1" value={quantity} onChange={(event) => updateQuantity(event.target.value)} className="w-14 bg-transparent text-center font-semibold outline-none" />
+              <button type="button" onClick={() => updateQuantity(quantity + 1)} className="focus-ring rounded-full p-3 text-ink/70 transition hover:text-clay dark:text-vellum/70" aria-label="Increase quantity">
+                <Plus size={16} />
+              </button>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <button onClick={() => addItem(product, quantity)} className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 px-6 py-4 font-semibold transition hover:border-clay hover:text-clay dark:border-white/10">
+              <ShoppingBag size={19} /> Add to Cart
+            </button>
+            <button onClick={orderNow} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+              <PackageCheck size={19} /> Order Now
+            </button>
+          </div>
           {product.videoUrl && (
             <a href={product.videoUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 px-6 py-4 font-semibold hover:text-clay dark:border-white/10">
               <PlayCircle size={19} /> Watch Product Video
             </a>
           )}
-          <Link to="/checkout" className="mt-4 block text-center text-sm font-semibold text-clay">Go to checkout</Link>
+          <Link to="/checkout" className="mt-4 block text-center text-sm font-semibold text-clay">Go to cart checkout</Link>
         </div>
       </div>
     </section>
