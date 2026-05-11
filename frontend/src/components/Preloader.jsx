@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSite } from "../context/SiteContext.jsx";
 
-const MINIMUM_VISIBLE_MS = 1200;
+const MINIMUM_VISIBLE_MS = 2600;
+const EXIT_DELAY_MS = 300;
 
 export default function Preloader() {
   const { settings, loading: settingsLoading } = useSite();
@@ -29,9 +30,15 @@ export default function Preloader() {
   useEffect(() => {
     if (!pageLoaded || settingsLoading || !minimumElapsed) return undefined;
 
-    setLeaving(true);
-    const exitTimer = window.setTimeout(() => setVisible(false), 650);
-    return () => window.clearTimeout(exitTimer);
+    const leaveTimer = window.setTimeout(() => {
+      setLeaving(true);
+    }, EXIT_DELAY_MS);
+    const exitTimer = window.setTimeout(() => setVisible(false), EXIT_DELAY_MS + 650);
+
+    return () => {
+      window.clearTimeout(leaveTimer);
+      window.clearTimeout(exitTimer);
+    };
   }, [minimumElapsed, pageLoaded, settingsLoading]);
 
   if (!visible) return null;
