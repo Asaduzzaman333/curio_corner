@@ -19,6 +19,24 @@ export default function Layout() {
   const { settings } = useSite();
   const { theme, toggleTheme } = useTheme();
 
+  const scrollToContact = () => {
+    const element = document.querySelector("#contact");
+    if (!element) return false;
+
+    const headerOffset = 96;
+    const top = element.getBoundingClientRect().top + window.scrollY - headerOffset;
+    window.history.replaceState(null, "", "/#contact");
+    window.scrollTo({ top, behavior: "smooth" });
+    return true;
+  };
+
+  const handleContactClick = (event) => {
+    if (window.location.pathname !== "/") return;
+    event.preventDefault();
+    scrollToContact();
+    setOpen(false);
+  };
+
   return (
     <div className="min-h-screen overflow-hidden bg-paper text-ink transition-colors dark:bg-[#17120f] dark:text-vellum">
       <header className="fixed inset-x-0 top-0 z-40 px-4 py-3">
@@ -29,7 +47,7 @@ export default function Layout() {
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             {nav.map((item) => (
-              <NavLink key={item.to} to={item.to} className={({ isActive }) => `text-sm font-semibold transition ${isActive ? "text-clay" : "hover:text-clay"}`}>
+              <NavLink key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : undefined} className={({ isActive }) => `text-sm font-semibold transition ${isActive ? "text-clay" : "hover:text-clay"}`}>
                 {item.label}
               </NavLink>
             ))}
@@ -58,7 +76,7 @@ export default function Layout() {
               </button>
               <div className="mt-8 grid gap-4">
                 {nav.map((item) => (
-                  <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className="rounded-2xl px-4 py-3 text-lg font-semibold hover:bg-paper dark:hover:bg-white/10">
+                  <Link key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : () => setOpen(false)} className="rounded-2xl px-4 py-3 text-lg font-semibold hover:bg-paper dark:hover:bg-white/10">
                     {item.label}
                   </Link>
                 ))}
