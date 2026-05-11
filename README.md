@@ -52,7 +52,7 @@ Production-ready handmade crafts eCommerce platform with a public storefront, se
 - Backend as a separate Vercel project or Node host:
   - Root directory: `backend`
   - Set all values from `backend/.env.example` in Vercel Environment Variables.
-  - For phone push notifications, also set `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT`. Generate keys with `npx web-push generate-vapid-keys --json`.
+  - Phone push notifications can use `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` from env. If they are not set, the API creates and stores a stable VAPID key pair in MongoDB automatically.
 - Set `VITE_API_URL` in both frontend/admin deployments to your backend URL.
 
 ## Security Notes

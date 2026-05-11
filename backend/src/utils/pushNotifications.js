@@ -1,21 +1,85 @@
 import webpush from "web-push";
 import { AdminPushSubscription } from "../models/AdminPushSubscription.js";
+import { PushSettings } from "../models/PushSettings.js";
 
-let configured = false;
+let cachedVapidConfig = null;
+let vapidConfigPromise = null;
+let configuredPublicKey = "";
 
-export const getVapidPublicKey = () => process.env.VAPID_PUBLIC_KEY || "";
+const getDefaultSubject = () => process.env.VAPID_SUBJECT || `mailto:${process.env.ADMIN_EMAIL || "admin@example.com"}`;
 
-export const isPushConfigured = () => Boolean(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
+const getEnvVapidConfig = () => {
+  if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return null;
 
-const configureWebPush = () => {
-  if (configured || !isPushConfigured()) return;
+  return {
+    publicKey: process.env.VAPID_PUBLIC_KEY,
+    privateKey: process.env.VAPID_PRIVATE_KEY,
+    subject: getDefaultSubject()
+  };
+};
 
-  webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || `mailto:${process.env.ADMIN_EMAIL || "admin@example.com"}`,
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-  );
-  configured = true;
+export const getVapidConfig = async () => {
+  const envConfig = getEnvVapidConfig();
+  if (envConfig) return envConfig;
+  if (cachedVapidConfig) return cachedVapidConfig;
+  if (vapidConfigPromise) return vapidConfigPromise;
+
+  vapidConfigPromise = (async () => {
+    const existing = await PushSettings.findOne({ key: "default" }).lean();
+    if (existing?.publicKey && existing?.privateKey) {
+      cachedVapidConfig = {
+        publicKey: existing.publicKey,
+        privateKey: existing.privateKey,
+        subject: existing.subject || getDefaultSubject()
+      };
+      return cachedVapidConfig;
+    }
+
+    const generated = webpush.generateVAPIDKeys();
+    const created = await PushSettings.findOneAndUpdate(
+      { key: "default" },
+      {
+        $setOnInsert: {
+          key: "default",
+          publicKey: generated.publicKey,
+          privateKey: generated.privateKey,
+          subject: getDefaultSubject()
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+
+    cachedVapidConfig = {
+      publicKey: created.publicKey,
+      privateKey: created.privateKey,
+      subject: created.subject
+    };
+    return cachedVapidConfig;
+  })().finally(() => {
+    vapidConfigPromise = null;
+  });
+
+  return vapidConfigPromise;
+};
+
+export const getVapidPublicKey = async () => {
+  const config = await getVapidConfig();
+  return config.publicKey;
+};
+
+export const isPushConfigured = async () => {
+  const config = await getVapidConfig();
+  return Boolean(config.publicKey && config.privateKey);
+};
+
+const configureWebPush = async () => {
+  const config = await getVapidConfig();
+  if (!config?.publicKey || !config?.privateKey) return false;
+  if (configuredPublicKey === config.publicKey) return true;
+
+  webpush.setVapidDetails(config.subject, config.publicKey, config.privateKey);
+  configuredPublicKey = config.publicKey;
+  return true;
 };
 
 const getItemCount = (order) => order.items?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0;
@@ -35,7 +99,7 @@ const buildOrderPayload = (order) =>
   });
 
 export const sendNewOrderPushNotification = async (order) => {
-  configureWebPush();
+  const configured = await configureWebPush();
   if (!configured) return { sent: 0, skipped: true };
 
   const subscriptions = await AdminPushSubscription.find({}).lean();

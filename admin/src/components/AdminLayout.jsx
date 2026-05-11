@@ -158,7 +158,7 @@ export default function AdminLayout() {
         if (!mounted) return;
         setPushSubscribed(Boolean(existingSubscription));
 
-        if (permission !== "denied" && permission !== "unsupported" && !existingSubscription) {
+        if (permission !== "denied" && permission !== "unsupported") {
           const result = await enablePushNotifications();
           if (!mounted) return;
           setNotificationPermission(result.permission);

@@ -11,9 +11,11 @@ pushRoutes.use(protectAdmin);
 pushRoutes.get(
   "/config",
   asyncHandler(async (req, res) => {
+    const [enabled, publicKey] = await Promise.all([isPushConfigured(), getVapidPublicKey()]);
+
     res.json({
-      enabled: isPushConfigured(),
-      publicKey: getVapidPublicKey()
+      enabled,
+      publicKey
     });
   })
 );
