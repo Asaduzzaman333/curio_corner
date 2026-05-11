@@ -5,6 +5,7 @@ import { protectAdmin } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { orderSchema, orderStatusSchema } from "../validators/schemas.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { io } from "../server.js";
 
 export const orderRoutes = express.Router();
 
@@ -14,6 +15,23 @@ orderRoutes.post(
   asyncHandler(async (req, res) => {
     const subtotal = req.body.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const order = await Order.create({ ...req.body, subtotal });
+    
+    // Broadcast new order notification to all connected admins
+    io.emit("new-order", {
+      message: `নতুন অর্ডার: ${order._id}`,
+      order: {
+        _id: order._id,
+        customerName: order.customerName,
+        phone: order.phone,
+        email: order.email,
+        itemCount: order.items.length,
+        subtotal: order.subtotal,
+        total: order.total,
+        status: order.status,
+        createdAt: order.createdAt
+      }
+    });
+    
     res.status(201).json({ message: "Order placed", order });
   })
 );

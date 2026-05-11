@@ -1,12 +1,26 @@
 import "dotenv/config";
 import dns from "node:dns";
-import bcrypt from "bcryptjs";
+import bcryptjs from "bcryptjs";
+import { createServer } from "node:http";
+import { Server as SocketIOServer } from "socket.io";
 import { app } from "./app.js";
 import { connectDB } from "./config/db.js";
 import { AdminUser } from "./models/AdminUser.js";
 
 const port = process.env.PORT || 5000;
 let adminBootstrapPromise;
+
+// Create HTTP server
+const httpServer = createServer(app);
+
+// Initialize Socket.IO
+export const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL].filter(Boolean),
+    credentials: true
+  },
+  transports: ["websocket", "polling"]
+});
 
 if (process.env.NODE_ENV !== "production") {
   const dnsServers = process.env.DNS_SERVERS?.split(",").map((server) => server.trim()).filter(Boolean) || [
@@ -27,7 +41,7 @@ const ensureDefaultAdmin = async () => {
     const existing = await AdminUser.findOne({ email });
     if (existing) return;
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await bcryptjs.hash(password, 12);
     await AdminUser.create({
       name: "Curio Corner Admin",
       email,
@@ -44,7 +58,7 @@ if (!process.env.VERCEL) {
   connectDB()
     .then(ensureDefaultAdmin)
     .then(() => {
-      app.listen(port, () => {
+      httpServer.listen(port, () => {
         console.log(`API running on port ${port}`);
       });
     })
