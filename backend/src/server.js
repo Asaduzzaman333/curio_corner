@@ -1,4 +1,5 @@
 import "dotenv/config";
+import dns from "node:dns";
 import bcrypt from "bcryptjs";
 import { app } from "./app.js";
 import { connectDB } from "./config/db.js";
@@ -6,6 +7,14 @@ import { AdminUser } from "./models/AdminUser.js";
 
 const port = process.env.PORT || 5000;
 let adminBootstrapPromise;
+
+if (process.env.NODE_ENV !== "production") {
+  const dnsServers = process.env.DNS_SERVERS?.split(",").map((server) => server.trim()).filter(Boolean) || [
+    "8.8.8.8",
+    "1.1.1.1"
+  ];
+  dns.setServers(dnsServers);
+}
 
 const ensureDefaultAdmin = async () => {
   if (adminBootstrapPromise) return adminBootstrapPromise;
@@ -52,9 +61,12 @@ export default async function handler(req, res) {
     return app(req, res);
   } catch (error) {
     console.error("API startup failed", error);
+    const isDiagnosticsEnabled = process.env.API_DEBUG === "true" || process.env.NODE_ENV !== "production";
     return res.status(500).json({
       message: "API startup failed",
-      error: process.env.NODE_ENV === "production" ? "Check Vercel function logs and environment variables" : error.message
+      error: isDiagnosticsEnabled ? error.message : "Check Vercel function logs and environment variables",
+      code: isDiagnosticsEnabled ? error.code : undefined,
+      name: isDiagnosticsEnabled ? error.name : undefined
     });
   }
 }

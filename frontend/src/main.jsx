@@ -6,6 +6,7 @@ import { CartProvider } from "./context/CartContext.jsx";
 import { SiteProvider } from "./context/SiteContext.jsx";
 import { ThemeProvider } from "./context/ThemeContext.jsx";
 import Layout from "./components/Layout.jsx";
+import Preloader from "./components/Preloader.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import "./styles.css";
 
@@ -20,6 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <ThemeProvider>
       <SiteProvider>
         <CartProvider>
+          <Preloader />
           <BrowserRouter>
             <ScrollToTop />
             <Suspense fallback={<div className="min-h-screen bg-paper p-8 text-ink">Loading collection...</div>}>
