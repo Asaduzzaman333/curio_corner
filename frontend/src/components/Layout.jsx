@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -15,9 +15,18 @@ const nav = [
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
+  const { hash, pathname } = useLocation();
   const { count } = useCart();
   const { settings } = useSite();
   const { theme, toggleTheme } = useTheme();
+
+  const isNavActive = (item) => {
+    if (item.to === "/") return pathname === "/" && hash !== "#contact";
+    if (item.to === "/#contact") return pathname === "/" && hash === "#contact";
+    return pathname === item.to;
+  };
+
+  const navClassName = (item) => `text-sm font-semibold transition ${isNavActive(item) ? "text-clay" : "text-ink hover:text-clay dark:text-vellum dark:hover:text-clay"}`;
 
   const scrollToContact = () => {
     const element = document.querySelector("#contact");
@@ -47,7 +56,7 @@ export default function Layout() {
           </Link>
           <div className="hidden items-center gap-8 md:flex">
             {nav.map((item) => (
-              <NavLink key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : undefined} className={({ isActive }) => `text-sm font-semibold transition ${isActive ? "text-clay" : "hover:text-clay"}`}>
+              <NavLink key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : undefined} className={navClassName(item)}>
                 {item.label}
               </NavLink>
             ))}
