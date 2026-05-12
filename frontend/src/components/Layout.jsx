@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Facebook, Instagram, Menu, Moon, ShoppingBag, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -6,6 +6,7 @@ import { useCart } from "../context/CartContext.jsx";
 import { useSite } from "../context/SiteContext.jsx";
 import { useTheme } from "../context/ThemeContext.jsx";
 import WhatsAppButton from "./WhatsAppButton.jsx";
+import StarryBackground from "./StarryBackground.jsx";
 
 const nav = [
   { label: "Home", to: "/" },
@@ -21,6 +22,7 @@ const socialMeta = {
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const { hash, pathname } = useLocation();
+  const navigate = useNavigate();
   const { count } = useCart();
   const { settings } = useSite();
   const { theme, toggleTheme } = useTheme();
@@ -43,102 +45,106 @@ export default function Layout() {
 
     const headerOffset = 96;
     const top = element.getBoundingClientRect().top + window.scrollY - headerOffset;
-    window.history.replaceState(null, "", "/#contact");
+    navigate("/#contact", { replace: true });
     window.scrollTo({ top, behavior: "smooth" });
     return true;
   };
 
   const handleContactClick = (event) => {
-    if (window.location.pathname !== "/") return;
+    setOpen(false);
+    if (pathname !== "/") return;
     event.preventDefault();
     scrollToContact();
-    setOpen(false);
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-paper text-ink transition-colors dark:bg-[#17120f] dark:text-vellum">
-      <header className="fixed inset-x-0 top-0 z-40 px-4 py-3">
-        <nav className="glass mx-auto flex max-w-7xl items-center justify-between rounded-full px-4 py-3 shadow-soft">
-          <Link to="/" className="flex items-center gap-3">
-            <img src={settings.logo?.url || "/assets/logo.jpg"} alt={settings.brandName} className="h-10 w-10 rounded-full object-cover" />
-            <span className="font-display text-lg font-bold sm:text-xl">{settings.brandName}</span>
-          </Link>
-          <div className="hidden items-center gap-8 md:flex">
-            {nav.map((item) => (
-              <NavLink key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : undefined} className={navClassName(item)}>
-                {item.label}
-              </NavLink>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <button aria-label="Toggle theme" onClick={toggleTheme} className="focus-ring rounded-full p-2 hover:bg-white/50 dark:hover:bg-white/10">
-              {theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
-            </button>
-            <Link aria-label="Checkout cart" to="/checkout" className="focus-ring relative rounded-full p-2 hover:bg-white/50 dark:hover:bg-white/10">
-              <ShoppingBag size={20} />
-              {count > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-rosewood px-1.5 text-[10px] font-bold text-white">{count}</span>}
+    <div className="relative min-h-screen overflow-hidden bg-paper text-ink transition-colors dark:bg-[#17120f] dark:text-vellum">
+      <StarryBackground />
+      
+      <div className="relative z-10">
+        <header className="fixed inset-x-0 top-0 z-40 px-4 py-3">
+          <nav className="glass mx-auto flex max-w-7xl items-center justify-between rounded-full px-4 py-3 shadow-soft">
+            <Link to="/" className="flex items-center gap-3">
+              <img src={settings.logo?.url || "/assets/logo.jpg"} alt={settings.brandName} className="h-10 w-10 rounded-full object-cover" />
+              <span className="font-display text-lg font-bold sm:text-xl">{settings.brandName}</span>
             </Link>
-            <button aria-label="Open menu" onClick={() => setOpen(true)} className="focus-ring rounded-full p-2 md:hidden">
-              <Menu size={21} />
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-ink/45 p-4 md:hidden">
-            <motion.div initial={{ x: 80 }} animate={{ x: 0 }} exit={{ x: 80 }} className="ml-auto h-full w-72 rounded-[28px] bg-vellum p-5 shadow-lift dark:bg-[#211915]">
-              <button aria-label="Close menu" onClick={() => setOpen(false)} className="ml-auto block rounded-full p-2">
-                <X />
+            <div className="hidden items-center gap-8 md:flex">
+              {nav.map((item) => (
+                <NavLink key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : undefined} className={navClassName(item)}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <button aria-label="Toggle theme" onClick={toggleTheme} className="focus-ring rounded-full p-2 hover:bg-white/50 dark:hover:bg-white/10">
+                {theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
               </button>
-              <div className="mt-8 grid gap-4">
-                {nav.map((item) => (
-                  <Link key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : () => setOpen(false)} className="rounded-2xl border-2 border-ink/30 px-4 py-3 text-lg font-semibold transition hover:border-clay hover:bg-paper dark:border-white/20 dark:hover:border-clay dark:hover:bg-white/10">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <Link aria-label="Checkout cart" to="/checkout" className="focus-ring relative rounded-full p-2 hover:bg-white/50 dark:hover:bg-white/10">
+                <ShoppingBag size={20} />
+                {count > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-rosewood px-1.5 text-[10px] font-bold text-white">{count}</span>}
+              </Link>
+              <button aria-label="Open menu" onClick={() => setOpen(true)} className="focus-ring rounded-full p-2 md:hidden">
+                <Menu size={21} />
+              </button>
+            </div>
+          </nav>
+        </header>
 
-      <main>
-        <Outlet />
-      </main>
-      <footer className="paper-texture border-t border-ink/10 px-5 py-12 dark:border-white/10">
-        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.3fr_1fr_1fr]">
-          <div>
-            <div className="flex items-center gap-3">
-              <img src={settings.logo?.url || "/assets/logo.jpg"} alt="" className="h-12 w-12 rounded-full object-cover" />
-              <h2 className="font-display text-2xl font-bold">{settings.brandName}</h2>
+        <AnimatePresence>
+          {open && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-ink/45 p-4 md:hidden">
+              <motion.div initial={{ x: 80 }} animate={{ x: 0 }} exit={{ x: 80 }} className="ml-auto h-full w-72 rounded-[28px] bg-vellum p-5 shadow-lift dark:bg-[#211915]">
+                <button aria-label="Close menu" onClick={() => setOpen(false)} className="ml-auto block rounded-full p-2">
+                  <X />
+                </button>
+                <div className="mt-8 grid gap-4">
+                  {nav.map((item) => (
+                    <Link key={item.to} to={item.to} onClick={item.to === "/#contact" ? handleContactClick : () => setOpen(false)} className="rounded-2xl border-2 border-ink/30 px-4 py-3 text-lg font-semibold transition hover:border-clay hover:bg-paper dark:border-white/20 dark:hover:border-clay dark:hover:bg-white/10">
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <main>
+          <Outlet />
+        </main>
+        <footer className="paper-texture border-t border-ink/10 px-5 py-12 dark:border-white/10">
+          <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-[1.3fr_1fr_1fr]">
+            <div>
+              <div className="flex items-center gap-3">
+                <img src={settings.logo?.url || "/assets/logo.jpg"} alt="" className="h-12 w-12 rounded-full object-cover" />
+                <h2 className="font-display text-2xl font-bold">{settings.brandName}</h2>
+              </div>
+              <p className="mt-4 max-w-md text-sm leading-7 text-ink/70 dark:text-vellum/70">{settings.about?.body}</p>
             </div>
-            <p className="mt-4 max-w-md text-sm leading-7 text-ink/70 dark:text-vellum/70">{settings.about?.body}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Visit</h3>
-            <p className="mt-4 text-sm leading-7 text-ink/70 dark:text-vellum/70">{settings.contact?.address}</p>
-            <p className="text-sm text-ink/70 dark:text-vellum/70">{settings.contact?.phone}</p>
-          </div>
-          <div>
-            <h3 className="font-semibold">Social</h3>
-            <div className="mt-4 grid gap-3">
-              {socialLinks.map((link) => {
-                const meta = socialMeta[link.label.toLowerCase()];
-                const Icon = meta.Icon;
-                return (
-                <a key={link.label} href={link.url || undefined} aria-disabled={!link.url} onClick={(event) => !link.url && event.preventDefault()} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 rounded-full border border-ink/10 px-4 py-2 text-sm font-semibold transition dark:border-white/10 ${link.url ? "hover:border-clay hover:text-clay" : "cursor-not-allowed opacity-45"}`}>
-                  <Icon size={17} />
-                  {meta.label}
-                </a>
-                );
-              })}
+            <div>
+              <h3 className="font-semibold">Visit</h3>
+              <p className="mt-4 text-sm leading-7 text-ink/70 dark:text-vellum/70">{settings.contact?.address}</p>
+              <p className="text-sm text-ink/70 dark:text-vellum/70">{settings.contact?.phone}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Social</h3>
+              <div className="mt-4 grid gap-3">
+                {socialLinks.map((link) => {
+                  const meta = socialMeta[link.label.toLowerCase()];
+                  const Icon = meta.Icon;
+                  return (
+                  <a key={link.label} href={link.url || undefined} aria-disabled={!link.url} onClick={(event) => !link.url && event.preventDefault()} target="_blank" rel="noreferrer" className={`inline-flex items-center gap-2 rounded-full border border-ink/10 px-4 py-2 text-sm font-semibold transition dark:border-white/10 ${link.url ? "hover:border-clay hover:text-clay" : "cursor-not-allowed opacity-45"}`}>
+                    <Icon size={17} />
+                    {meta.label}
+                  </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
-      <WhatsAppButton />
+        </footer>
+        <WhatsAppButton />
+      </div>
     </div>
   );
 }
