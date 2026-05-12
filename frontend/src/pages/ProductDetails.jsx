@@ -66,7 +66,7 @@ export default function ProductDetails() {
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.85fr]">
         <div>
           <div className="overflow-hidden rounded-[36px] bg-paper shadow-soft dark:bg-[#211915]">
-            <img src={active} alt={product.name} className="aspect-square sm:aspect-[4/4.2] w-full object-cover block" />
+            <img src={active} alt={product.name} className="aspect-square sm:aspect-[4/4.2] w-full object-contain block" />
           </div>
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
             {(product.images?.length ? product.images : [{ url: "/assets/cover.jpg" }]).map((image) => (
