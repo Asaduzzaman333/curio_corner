@@ -11,7 +11,7 @@ const initialForm = {
   price: "",
   discountPrice: "",
   mainImageUrl: "",
-  galleryImagesText: "",
+  galleryImages: ["", "", ""],
   videoUrl: "",
   stockStatus: "made-to-order",
   tagsText: "handmade, customized",
@@ -22,12 +22,6 @@ const initialForm = {
 };
 
 const fallbackCategories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Craft Items", "Customized Gifts"];
-
-const parseImageUrls = (text) =>
-  text
-    .split("\n")
-    .map((url) => url.trim())
-    .filter(Boolean);
 
 const convertDriveLinks = (text) => {
   if (!text) return text;
@@ -59,11 +53,10 @@ export default function Products() {
     loadCategories();
   }, []);
 
-  const galleryImageUrls = useMemo(() => parseImageUrls(form.galleryImagesText), [form.galleryImagesText]);
   const imageUrls = useMemo(() => {
-    const urls = [form.mainImageUrl.trim(), ...galleryImageUrls].filter(Boolean);
+    const urls = [form.mainImageUrl.trim(), ...form.galleryImages.map((u) => u.trim())].filter(Boolean);
     return [...new Set(urls)];
-  }, [form.mainImageUrl, galleryImageUrls]);
+  }, [form.mainImageUrl, form.galleryImages]);
 
   const payload = useMemo(() => ({
     name: form.name,
@@ -82,10 +75,13 @@ export default function Products() {
   }), [form, imageUrls]);
 
   const removeGalleryImage = (urlToRemove) => {
-    setForm((current) => ({
-      ...current,
-      galleryImagesText: parseImageUrls(current.galleryImagesText).filter((url) => url !== urlToRemove).join("\n")
-    }));
+    setForm((current) => {
+      const shifted = current.galleryImages.filter((url) => url && url !== urlToRemove);
+      return {
+        ...current,
+        galleryImages: [shifted[0] || "", shifted[1] || "", shifted[2] || ""]
+      };
+    });
   };
 
   const uploadImages = async (files, target = "gallery") => {
@@ -102,16 +98,16 @@ export default function Products() {
       setForm((current) => {
         if (target === "main") {
           const [mainUrl, ...extraUrls] = uploadedUrls;
-          const mergedGallery = [...parseImageUrls(current.galleryImagesText), ...extraUrls];
+          const mergedGallery = [...current.galleryImages.filter(Boolean), ...extraUrls];
           return {
             ...current,
             mainImageUrl: mainUrl || current.mainImageUrl,
-            galleryImagesText: [...new Set(mergedGallery)].join("\n")
+            galleryImages: [mergedGallery[0] || "", mergedGallery[1] || "", mergedGallery[2] || ""]
           };
         }
 
-        const merged = [...parseImageUrls(current.galleryImagesText), ...uploadedUrls];
-        return { ...current, galleryImagesText: [...new Set(merged)].join("\n") };
+        const merged = [...current.galleryImages.filter(Boolean), ...uploadedUrls];
+        return { ...current, galleryImages: [merged[0] || "", merged[1] || "", merged[2] || ""] };
       });
       toast.success(`${uploadedUrls.length} product photo${uploadedUrls.length === 1 ? "" : "s"} added`);
     } catch (error) {
@@ -148,7 +144,11 @@ export default function Products() {
       price: product.price || "",
       discountPrice: product.discountPrice || "",
       mainImageUrl: product.images?.[0]?.url || "",
-      galleryImagesText: product.images?.slice(1).map((image) => image.url).join("\n") || "",
+      galleryImages: [
+        product.images?.[1]?.url || "",
+        product.images?.[2]?.url || "",
+        product.images?.[3]?.url || ""
+      ],
       videoUrl: product.videoUrl || "",
       stockStatus: product.stockStatus || "made-to-order",
       tagsText: product.tags?.join(", ") || "",
@@ -191,7 +191,7 @@ export default function Products() {
               <option value="low-stock">Low stock</option>
               <option value="out-of-stock">Out of stock</option>
             </select>
-            <input className="input" placeholder="Video URL" value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} />
+            <input className="input" placeholder="Video URL" value={form.videoUrl} onChange={(e) => setForm({ ...form, videoUrl: convertDriveLinks(e.target.value) })} />
             <textarea className="input lg:col-span-2" rows="4" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
             <div className="lg:col-span-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
@@ -211,13 +211,27 @@ export default function Products() {
             </div>
             <div className="lg:col-span-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm text-vellum/60">Additional gallery photo URLs</label>
+                <label className="text-sm text-vellum/60">Additional gallery photo URLs (Max 3)</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
                   <Upload size={16} /> {uploadingImages === "gallery" ? "Uploading..." : "Upload Gallery Photos"}
                   <input type="file" accept="image/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
                 </label>
               </div>
-              <textarea className="input" rows="4" placeholder="Extra product detail/gallery image URLs, one per line." value={form.galleryImagesText} onChange={(e) => setForm({ ...form, galleryImagesText: convertDriveLinks(e.target.value) })} />
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[0, 1, 2].map((index) => (
+                  <input
+                    key={index}
+                    className="input"
+                    placeholder={`Gallery photo URL ${index + 1}`}
+                    value={form.galleryImages[index]}
+                    onChange={(e) => {
+                      const newGallery = [...form.galleryImages];
+                      newGallery[index] = convertDriveLinks(e.target.value);
+                      setForm({ ...form, galleryImages: newGallery });
+                    }}
+                  />
+                ))}
+              </div>
               {imageUrls.length > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {imageUrls.map((url, index) => (
