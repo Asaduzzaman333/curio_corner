@@ -31,7 +31,9 @@ const parseImageUrls = (text) =>
 
 const convertDriveLinks = (text) => {
   if (!text) return text;
-  return text.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/\S*/g, "https://drive.google.com/uc?export=view&id=$1");
+  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=view&id=$1");
+  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/(?:open|uc)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://drive.google.com/uc?export=view&id=$1");
+  return converted;
 };
 
 export default function Products() {
