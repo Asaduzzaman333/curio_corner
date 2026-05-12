@@ -188,7 +188,7 @@ export default function Products() {
             <textarea className="input lg:col-span-2" rows="4" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
             <div className="lg:col-span-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm text-vellum/60">Main product photo</label>
+                <label className="text-sm text-vellum/60">Main product photo URL</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
                   <Upload size={16} /> {uploadingImages === "main" ? "Uploading..." : "Upload Main Photo"}
                   <input type="file" accept="image/*" className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "main")} />
@@ -204,7 +204,7 @@ export default function Products() {
             </div>
             <div className="lg:col-span-2">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm text-vellum/60">Additional gallery photos</label>
+                <label className="text-sm text-vellum/60">Additional gallery photo URLs</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
                   <Upload size={16} /> {uploadingImages === "gallery" ? "Uploading..." : "Upload Gallery Photos"}
                   <input type="file" accept="image/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
