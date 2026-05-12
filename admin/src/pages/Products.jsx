@@ -25,8 +25,8 @@ const fallbackCategories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Cra
 
 const convertDriveLinks = (text) => {
   if (!text) return text;
-  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=view&id=$1");
-  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://drive.google.com/uc?export=view&id=$1");
+  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://lh3.googleusercontent.com/d/$1");
+  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://lh3.googleusercontent.com/d/$1");
   return converted;
 };
 
@@ -143,13 +143,13 @@ export default function Products() {
       category: product.category || "Handmade Cards",
       price: product.price || "",
       discountPrice: product.discountPrice || "",
-      mainImageUrl: product.images?.[0]?.url || "",
+      mainImageUrl: convertDriveLinks(product.images?.[0]?.url || ""),
       galleryImages: [
-        product.images?.[1]?.url || "",
-        product.images?.[2]?.url || "",
-        product.images?.[3]?.url || ""
+        convertDriveLinks(product.images?.[1]?.url || ""),
+        convertDriveLinks(product.images?.[2]?.url || ""),
+        convertDriveLinks(product.images?.[3]?.url || "")
       ],
-      videoUrl: product.videoUrl || "",
+      videoUrl: convertDriveLinks(product.videoUrl || ""),
       stockStatus: product.stockStatus || "made-to-order",
       tagsText: product.tags?.join(", ") || "",
       isFeatured: Boolean(product.isFeatured),
@@ -285,7 +285,7 @@ export default function Products() {
                 <tr key={product._id}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt="" className="h-12 w-12 rounded-2xl object-cover" />
+                      <img src={convertDriveLinks(product.images?.[0]?.url) || "/assets/cover.jpg"} alt="" className="h-12 w-12 rounded-2xl object-cover" />
                       <span className="font-semibold">{product.name}</span>
                     </div>
                   </td>

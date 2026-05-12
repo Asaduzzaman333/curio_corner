@@ -34,9 +34,20 @@ const fallback = {
   testimonials: []
 };
 
+const convertDriveLinks = (text) => {
+  if (!text) return text;
+  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://lh3.googleusercontent.com/d/$1");
+  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://lh3.googleusercontent.com/d/$1");
+  return converted;
+};
+
 const mergeSettings = (data = {}) => ({
   ...fallback,
   ...data,
+  logo: { ...fallback.logo, ...data.logo, url: data.logo?.url ? convertDriveLinks(data.logo.url) : fallback.logo.url },
+  cover: { ...fallback.cover, ...data.cover, url: data.cover?.url ? convertDriveLinks(data.cover.url) : fallback.cover.url },
+  aboutImage: { ...fallback.aboutImage, ...data.aboutImage, url: data.aboutImage?.url ? convertDriveLinks(data.aboutImage.url) : fallback.aboutImage.url },
+  heroImages: (data.heroImages || fallback.heroImages).map(img => ({ ...img, url: img.url ? convertDriveLinks(img.url) : fallback.heroImages[0].url })),
   homepage: { ...fallback.homepage, ...data.homepage },
   sections: {
     featured: { ...fallback.sections.featured, ...data.sections?.featured },
@@ -48,13 +59,6 @@ const mergeSettings = (data = {}) => ({
   about: { ...fallback.about, ...data.about },
   contact: { ...fallback.contact, ...data.contact }
 });
-
-const convertDriveLinks = (text) => {
-  if (!text) return text;
-  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=view&id=$1");
-  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://drive.google.com/uc?export=view&id=$1");
-  return converted;
-};
 
 export default function Content() {
   const [settings, setSettings] = useState(fallback);
