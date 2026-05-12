@@ -65,10 +65,10 @@ export default function ProductDetails() {
     <section className="min-h-screen px-5 pb-24 pt-32">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.85fr]">
         <div>
-          <div className="flex overflow-hidden rounded-[36px] bg-vellum shadow-soft dark:bg-[#211915]">
+          <div className="overflow-hidden rounded-[36px] shadow-soft dark:bg-[#211915]">
             <img src={active} alt={product.name} className="w-full h-auto object-cover block" />
           </div>
-          <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+          <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
             {(product.images?.length ? product.images : [{ url: "/assets/cover.jpg" }]).map((image) => (
               <button key={image.url} onClick={() => setActive(image.url)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 ${active === image.url ? "border-clay" : "border-transparent"}`}>
                 <img src={image.url} alt={image.alt || product.name} className="h-full w-full object-cover" />
