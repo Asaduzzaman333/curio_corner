@@ -6,7 +6,6 @@ import { useCart } from "../context/CartContext.jsx";
 import { useSite } from "../context/SiteContext.jsx";
 import { useTheme } from "../context/ThemeContext.jsx";
 import WhatsAppButton from "./WhatsAppButton.jsx";
-import StarryBackground from "./StarryBackground.jsx";
 
 const nav = [
   { label: "Home", to: "/" },
@@ -58,10 +57,7 @@ export default function Layout() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-paper text-ink transition-colors dark:bg-[#17120f] dark:text-vellum">
-      <StarryBackground />
-      
-      <div className="relative z-10">
+    <div className="min-h-screen overflow-hidden bg-paper text-ink transition-colors dark:bg-[#17120f] dark:text-vellum">
         <header className="fixed inset-x-0 top-0 z-40 px-4 py-3">
           <nav className="glass mx-auto flex max-w-7xl items-center justify-between rounded-full px-4 py-3 shadow-soft">
             <Link to="/" className="flex items-center gap-3">
@@ -144,7 +140,6 @@ export default function Layout() {
           </div>
         </footer>
         <WhatsAppButton />
-      </div>
     </div>
   );
 }
