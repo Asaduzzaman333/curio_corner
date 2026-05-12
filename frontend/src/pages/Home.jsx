@@ -55,9 +55,6 @@ export default function Home() {
         <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 7, repeat: Infinity }} className="absolute right-[8%] top-32 hidden rounded-full bg-vellum/80 p-5 shadow-soft md:block">
           <Sparkles className="text-gold" />
         </motion.div>
-        <motion.div animate={{ y: [0, 12, 0] }} transition={{ duration: 8, repeat: Infinity }} className="absolute bottom-24 left-[7%] hidden rounded-full bg-vellum/75 p-4 shadow-soft sm:block">
-          <Heart className="text-rosewood" />
-        </motion.div>
         <div className="relative z-10 mx-auto grid max-w-7xl items-end gap-8 sm:gap-10 lg:min-h-[70vh] lg:grid-cols-[1.05fr_0.95fr]">
           <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="overflow-hidden rounded-[30px] border border-white/65 bg-vellum/80 p-2 shadow-soft backdrop-blur md:hidden dark:border-white/10 dark:bg-[#211915]/80">
             <div className="overflow-hidden rounded-[24px]">

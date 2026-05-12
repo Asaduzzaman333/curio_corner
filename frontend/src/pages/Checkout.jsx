@@ -79,7 +79,7 @@ export default function Checkout() {
           <h1 className="font-display text-4xl font-bold">{isDirectCheckout ? "Direct order details" : "Delivery details"}</h1>
           <div className="mt-8 grid gap-4">
             <input required value={form.customerName} onChange={(event) => setForm({ ...form, customerName: event.target.value })} placeholder="Customer name" className="rounded-2xl border border-ink/10 bg-transparent px-4 py-3 outline-none focus:border-clay dark:border-white/10" />
-            <input required value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="Phone number" className="rounded-2xl border border-ink/10 bg-transparent px-4 py-3 outline-none focus:border-clay dark:border-white/10" />
+            <input required type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value.replace(/\D/g, "") })} placeholder="Phone number" className="rounded-2xl border border-ink/10 bg-transparent px-4 py-3 outline-none focus:border-clay dark:border-white/10" />
             <textarea required value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} placeholder="Address" rows="4" className="rounded-2xl border border-ink/10 bg-transparent px-4 py-3 outline-none focus:border-clay dark:border-white/10" />
             <textarea value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} placeholder="Notes, customization, preferred colors..." rows="4" className="rounded-2xl border border-ink/10 bg-transparent px-4 py-3 outline-none focus:border-clay dark:border-white/10" />
           </div>
