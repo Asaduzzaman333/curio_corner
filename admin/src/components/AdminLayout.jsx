@@ -175,13 +175,6 @@ export default function AdminLayout() {
         const existingSubscription = await registration.pushManager.getSubscription();
         if (!mounted) return;
         setPushSubscribed(Boolean(existingSubscription));
-
-        if (permission !== "denied" && permission !== "unsupported") {
-          const result = await enablePushNotifications();
-          if (!mounted) return;
-          setNotificationPermission(result.permission);
-          setPushSubscribed(Boolean(result.subscribed));
-        }
       })
       .catch((error) => {
         console.error("Could not initialize push notifications", error);
@@ -191,6 +184,21 @@ export default function AdminLayout() {
       mounted = false;
     };
   }, [admin]);
+
+  const enableDeviceNotifications = async () => {
+    try {
+      const result = await enablePushNotifications();
+      setNotificationPermission(result.permission);
+      setPushSubscribed(result.subscribed);
+      if (result.subscribed) {
+        toast.success("Phone notifications enabled.");
+      } else if (result.permission === "denied") {
+        toast.error("Notifications are blocked. Please enable them in browser settings.");
+      }
+    } catch (error) {
+      toast.error(error.message || "Could not enable phone notifications.");
+    }
+  };
 
   const disableDeviceNotifications = async () => {
     try {
@@ -293,7 +301,7 @@ export default function AdminLayout() {
                     <p className="text-xs text-vellum/45">{notificationStatus}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {pushSubscribed && (
+                    {pushSubscribed ? (
                       <button
                         type="button"
                         onClick={disableDeviceNotifications}
@@ -301,6 +309,17 @@ export default function AdminLayout() {
                       >
                         Disable
                       </button>
+                    ) : (
+                      notificationPermission !== "denied" &&
+                      notificationPermission !== "unsupported" && (
+                        <button
+                          type="button"
+                          onClick={enableDeviceNotifications}
+                          className="rounded-full bg-vellum/10 px-3 py-1.5 text-xs font-semibold text-vellum/75 transition hover:text-vellum"
+                        >
+                          Enable
+                        </button>
+                      )
                     )}
                     {notifications.length > 0 && (
                       <button
