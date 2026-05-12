@@ -62,6 +62,24 @@ export default function AdminLayout() {
   const checkingNotificationsRef = useRef(false);
   const initializedNotificationsRef = useRef(false);
   const lastOrderIdRef = useRef(localStorage.getItem(LAST_ORDER_KEY));
+  const notificationRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const rememberLatestOrder = useCallback((orderId) => {
     if (!orderId) return;
@@ -252,7 +270,7 @@ export default function AdminLayout() {
           <Menu />
         </button>
         <div className="ml-auto">
-          <div className="relative">
+          <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications((value) => !value)}
               className="admin-card relative flex items-center gap-2 rounded-2xl px-4 py-3 transition hover:shadow-glow"
