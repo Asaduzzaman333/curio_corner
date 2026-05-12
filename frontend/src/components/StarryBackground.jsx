@@ -3,28 +3,41 @@ export default function StarryBackground() {
     <>
       <style>
         {`
-          .bg-stars {
-            background-image: 
-              radial-gradient(1px 1px at 25px 30px, #ffffff, rgba(0,0,0,0)),
-              radial-gradient(1px 1px at 50px 80px, #ffffff, rgba(0,0,0,0)),
-              radial-gradient(1px 1px at 90px 110px, #ffffff, rgba(0,0,0,0)),
-              radial-gradient(1.5px 1.5px at 130px 40px, #ffffff, rgba(0,0,0,0)),
-              radial-gradient(2px 2px at 170px 90px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
-              radial-gradient(1.5px 1.5px at 190px 140px, #ffffff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            animation: twinkle 5s infinite alternate;
-            opacity: 0.3;
+          .stars-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
           }
-
+          .stars-1 {
+            background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 80% 40%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 40% 80%, rgba(255,255,255,0.8) 1.5px, transparent 1.5px),
+                              radial-gradient(circle at 60% 15%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 90% 85%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 10% 90%, rgba(255,255,255,0.8) 1.5px, transparent 1.5px);
+            background-size: 150px 150px;
+            animation: twinkle 3s infinite alternate;
+          }
+          .stars-2 {
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 15% 70%, rgba(255,255,255,0.8) 1.5px, transparent 1.5px),
+                              radial-gradient(circle at 85% 10%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                              radial-gradient(circle at 30% 50%, rgba(255,255,255,0.8) 2px, transparent 2px);
+            background-size: 200px 200px;
+            background-position: 50px 50px;
+            animation: twinkle 4s infinite alternate-reverse;
+          }
           @keyframes twinkle {
-            0% { opacity: 0.1; transform: scale(0.9); }
-            100% { opacity: 0.4; transform: scale(1); }
+            0% { opacity: 0.1; }
+            100% { opacity: 0.7; }
           }
         `}
       </style>
-      {/* fixed ব্যবহার করা হয়েছে যাতে স্ক্রল করলেও ব্যাকগ্রাউন্ড জায়গামতো থাকে */}
-      <div className="pointer-events-none fixed inset-0 z-0 hidden bg-stars dark:block"></div>
+      {/* z-20 এবং mix-blend-screen যোগ করা হয়েছে যাতে হোমপেজের ছবি বা কন্টেন্ট একে ঢেকে না দেয় */}
+      <div className="pointer-events-none fixed inset-0 z-20 hidden mix-blend-screen dark:block">
+        <div className="stars-layer stars-1"></div>
+        <div className="stars-layer stars-2"></div>
+      </div>
     </>
   );
 }
