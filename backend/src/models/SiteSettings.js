@@ -25,6 +25,14 @@ const siteSettingsSchema = new mongoose.Schema(
     logo: { url: { type: String, default: "/assets/logo.jpg" }, publicId: String },
     cover: { url: { type: String, default: "/assets/cover.jpg" }, publicId: String },
     aboutImage: { url: { type: String, default: "/assets/cover.jpg" }, publicId: String },
+    heroImages: {
+      type: [{ url: String, publicId: String }],
+      default: [
+        { url: "/assets/cover.jpg" },
+        { url: "/assets/cover.jpg" },
+        { url: "/assets/cover.jpg" }
+      ]
+    },
     about: {
       title: { type: String, default: "Crafted for moments that deserve feeling" },
       body: {

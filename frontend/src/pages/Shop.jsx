@@ -8,8 +8,8 @@ import { categories as fallbackCategories, fallbackProducts } from "../data/fall
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
-  const [products, setProducts] = useState(fallbackProducts);
-  const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
+  const [products, setProducts] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(params.get("search") || "");
   const category = params.get("category") || "All";
@@ -34,8 +34,8 @@ export default function Shop() {
           limit: featuredOnly || trendingOnly ? 60 : 24
         }
       })
-      .then(({ data }) => mounted && setProducts(data.items?.length ? data.items : fallbackProducts))
-      .catch(() => mounted && setProducts(fallbackProducts))
+      .then(({ data }) => mounted && setProducts(data.items || []))
+      .catch(() => mounted && setProducts([]))
       .finally(() => mounted && setLoading(false));
     return () => {
       mounted = false;
@@ -46,8 +46,8 @@ export default function Shop() {
     let mounted = true;
     api
       .get("/categories")
-      .then(({ data }) => mounted && setCategoryOptions(data.items?.length ? data.items : fallbackCategories))
-      .catch(() => mounted && setCategoryOptions(fallbackCategories));
+      .then(({ data }) => mounted && setCategoryOptions(data.items || []))
+      .catch(() => mounted && setCategoryOptions([]));
     return () => {
       mounted = false;
     };

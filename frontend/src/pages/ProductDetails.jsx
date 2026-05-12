@@ -5,18 +5,19 @@ import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext.jsx";
 import { api } from "../utils/api.js";
 import { createDirectOrderItem, saveDirectOrder } from "../utils/directOrder.js";
-import { fallbackProducts } from "../data/fallback.js";
 
 export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { addItem } = useCart();
-  const [product, setProduct] = useState(() => fallbackProducts.find((item) => item.slug === slug) || fallbackProducts[0]);
-  const [active, setActive] = useState(product.images?.[0]?.url || "/assets/cover.jpg");
+  const [product, setProduct] = useState(null);
+  const [active, setActive] = useState("/assets/cover.jpg");
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
     api
       .get(`/products/${slug}`)
       .then(({ data }) => {
@@ -27,19 +28,30 @@ export default function ProductDetails() {
         }
       })
       .catch(() => {
-        const fallback = fallbackProducts.find((item) => item.slug === slug);
-        if (fallback) {
-          setProduct(fallback);
-          setActive(fallback.images?.[0]?.url || "/assets/cover.jpg");
-          setQuantity(1);
-        } else {
+        if (mounted) {
           toast.error("Product unavailable");
+          navigate("/shop");
         }
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, [slug]);
+  }, [slug, navigate]);
+
+  if (loading) {
+    return (
+      <section className="min-h-screen px-5 pb-24 pt-32">
+        <div className="mx-auto max-w-7xl text-center">
+          <p>Loading product details...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!product) return null;
 
   const price = product.discountPrice || product.price;
   const updateQuantity = (value) => setQuantity(Math.max(1, Number(value) || 1));

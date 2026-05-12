@@ -9,6 +9,7 @@ const fallback = {
   logo: { url: "/assets/logo.jpg" },
   cover: { url: "/assets/cover.jpg" },
   aboutImage: { url: "/assets/cover.jpg" },
+  heroImages: [{ url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }],
   homepage: { headline: "", subheadline: "", ctaLabel: "" },
   sections: {
     featured: {
@@ -97,11 +98,19 @@ export default function Content() {
     }
   };
 
-  const deleteAsset = (key) => {
-    setSettings((current) => ({ ...current, [key]: { url: "" } }));
+  const deleteAsset = (key, index = null) => {
+    if (index !== null) {
+      setSettings((current) => {
+        const newHeroImages = [...(current.heroImages || fallback.heroImages)];
+        newHeroImages[index] = { url: "" };
+        return { ...current, heroImages: newHeroImages };
+      });
+    } else {
+      setSettings((current) => ({ ...current, [key]: { url: "" } }));
+    }
   };
 
-  const uploadAsset = async (key, file) => {
+  const uploadAsset = async (key, file, index = null) => {
     if (!file) return;
     const formData = new FormData();
     formData.append("images", file);
@@ -110,7 +119,15 @@ export default function Content() {
       const { data } = await api.post("/media", formData, { headers: { "Content-Type": "multipart/form-data" } });
       const uploaded = data.items?.[0];
       if (uploaded?.url) {
-        setSettings((current) => ({ ...current, [key]: { url: uploaded.url, publicId: uploaded.publicId } }));
+        if (index !== null) {
+          setSettings((current) => {
+            const newHeroImages = [...(current.heroImages || fallback.heroImages)];
+            newHeroImages[index] = { url: uploaded.url, publicId: uploaded.publicId };
+            return { ...current, heroImages: newHeroImages };
+          });
+        } else {
+          setSettings((current) => ({ ...current, [key]: { url: uploaded.url, publicId: uploaded.publicId } }));
+        }
         toast.success(`${key} uploaded. Save content to publish it.`);
       }
     } catch (error) {
@@ -163,6 +180,30 @@ export default function Content() {
               </div>
               <img src={settings.aboutImage?.url || "/assets/cover.jpg"} alt="" className="mt-3 h-28 w-full rounded-2xl object-cover" />
             </div>
+          </div>
+        </section>
+
+        <section className="admin-card rounded-[28px] p-5">
+          <h2 className="font-display text-2xl font-bold">Hero Images (3 Photos)</h2>
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
+            {[0, 1, 2].map((index) => (
+              <div key={index}>
+                <label className="mb-2 block text-sm text-vellum/60">Hero Image {index + 1}</label>
+                <div className="flex gap-2">
+                  <input className="input" value={settings.heroImages?.[index]?.url || ""} onChange={(e) => {
+                    const newHeroImages = [...(settings.heroImages || fallback.heroImages)];
+                    newHeroImages[index] = { url: e.target.value };
+                    setSettings({ ...settings, heroImages: newHeroImages });
+                  }} placeholder="Paste image URL" />
+                  <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">
+                    <Upload size={17} />
+                    <input type="file" accept="image/*" className="hidden" disabled={uploading === `heroImage${index}`} onChange={(e) => uploadAsset(`heroImage${index}`, e.target.files?.[0], index)} />
+                  </label>
+                  <button type="button" onClick={() => deleteAsset("heroImages", index)} className="rounded-2xl bg-rosewood px-4"><Trash2 size={17} /></button>
+                </div>
+                <img src={settings.heroImages?.[index]?.url || "/assets/cover.jpg"} alt="" className="mt-3 h-28 w-full rounded-2xl object-cover" />
+              </div>
+            ))}
           </div>
         </section>
 

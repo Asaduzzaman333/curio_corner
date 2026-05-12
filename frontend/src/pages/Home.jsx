@@ -14,16 +14,16 @@ const categoryIcons = [Gift, Heart, Sparkles, Star, ArrowRight];
 export default function Home() {
   const { settings } = useSite();
   const sections = settings.sections || {};
-  const [products, setProducts] = useState(fallbackProducts);
-  const [categoryOptions, setCategoryOptions] = useState(fallbackCategories);
+  const [products, setProducts] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     api
       .get("/products", { params: { limit: 8 } })
-      .then(({ data }) => mounted && data.items?.length && setProducts(data.items))
-      .catch(() => mounted && setProducts(fallbackProducts))
+      .then(({ data }) => mounted && setProducts(data.items || []))
+      .catch(() => mounted && setProducts([]))
       .finally(() => mounted && setLoading(false));
     return () => {
       mounted = false;
@@ -34,8 +34,8 @@ export default function Home() {
     let mounted = true;
     api
       .get("/categories")
-      .then(({ data }) => mounted && setCategoryOptions(data.items?.length ? data.items : fallbackCategories))
-      .catch(() => mounted && setCategoryOptions(fallbackCategories));
+      .then(({ data }) => mounted && setCategoryOptions(data.items || []))
+      .catch(() => mounted && setCategoryOptions([]));
     return () => {
       mounted = false;
     };
@@ -81,38 +81,42 @@ export default function Home() {
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }} className="glass hidden rounded-[36px] p-5 shadow-soft md:block">
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {products.slice(0, 3).map((product, index) => (
-                <Link key={product._id} to={`/products/${product.slug}`} className={`${index === 1 ? "mt-10" : ""} overflow-hidden rounded-[28px] bg-white shadow-soft`}>
-                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
-                </Link>
+              {(settings.heroImages?.length === 3 ? settings.heroImages : [{ url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }]).map((image, index) => (
+                <div key={index} className={`${index === 1 ? "mt-10" : ""} overflow-hidden rounded-[28px] bg-white shadow-soft`}>
+                  <img src={image.url || "/assets/cover.jpg"} alt={`Hero ${index + 1}`} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
+                </div>
               ))}
             </div>
           </motion.div>
         </div>
       </section>
 
-      <section className="px-5 py-12 sm:py-20">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow={sections.featured?.eyebrow} title={sections.featured?.title} body={sections.featured?.body} />
-          {loading ? <SkeletonGrid /> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{featured.map((product) => <ProductCard key={product._id} product={product} />)}</div>}
-          <div className="mt-8 flex justify-center">
-            <Link to="/shop?featured=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
-              See all featured <ArrowRight size={18} />
-            </Link>
+      {featured.length > 0 && (
+        <section className="px-5 py-12 sm:py-20">
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle eyebrow={sections.featured?.eyebrow} title={sections.featured?.title} body={sections.featured?.body} />
+            {loading ? <SkeletonGrid /> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{featured.map((product) => <ProductCard key={product._id} product={product} />)}</div>}
+            <div className="mt-8 flex justify-center">
+              <Link to="/shop?featured=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+                See all featured <ArrowRight size={18} />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="paper-texture px-5 py-20">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow={sections.categories?.eyebrow} title={sections.categories?.title} body={sections.categories?.body} />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {categoryOptions.map((category, index) => (
-              <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} body={sections.categories?.tileBody} />
-            ))}
+      {categoryOptions.length > 0 && (
+        <section className="paper-texture px-5 py-20">
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle eyebrow={sections.categories?.eyebrow} title={sections.categories?.title} body={sections.categories?.body} />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              {categoryOptions.map((category, index) => (
+                <CategoryTile key={category} category={category} Icon={categoryIcons[index % categoryIcons.length]} body={sections.categories?.tileBody} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="px-5 py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
@@ -135,30 +139,34 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="paper-texture px-5 py-20">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow={sections.trending?.eyebrow} title={sections.trending?.title} body={sections.trending?.body} />
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{(trending.length ? trending : products.slice(0, 4)).map((product) => <ProductCard key={product._id} product={product} />)}</div>
-          <div className="mt-8 flex justify-center">
-            <Link to="/shop?trending=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
-              See all trending <ArrowRight size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-20">
-        <div className="mx-auto max-w-7xl">
-          <SectionTitle eyebrow={sections.gallery?.eyebrow} title={sections.gallery?.title} body={sections.gallery?.body} />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {products.slice(0, 6).map((product) => (
-              <Link key={product._id} to={`/products/${product.slug}`} className="group overflow-hidden rounded-[28px] bg-vellum shadow-soft dark:bg-[#211915]">
-                <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-700 hover:scale-105" />
+      {trending.length > 0 && (
+        <section className="paper-texture px-5 py-20">
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle eyebrow={sections.trending?.eyebrow} title={sections.trending?.title} body={sections.trending?.body} />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{trending.map((product) => <ProductCard key={product._id} product={product} />)}</div>
+            <div className="mt-8 flex justify-center">
+              <Link to="/shop?trending=true" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+                See all trending <ArrowRight size={18} />
               </Link>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {products.length > 0 && (
+        <section className="px-5 py-20">
+          <div className="mx-auto max-w-7xl">
+            <SectionTitle eyebrow={sections.gallery?.eyebrow} title={sections.gallery?.title} body={sections.gallery?.body} />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {products.slice(0, 6).map((product) => (
+                <Link key={product._id} to={`/products/${product.slug}`} className="group overflow-hidden rounded-[28px] bg-vellum shadow-soft dark:bg-[#211915]">
+                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-700 hover:scale-105" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="px-5 py-20">
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2">
