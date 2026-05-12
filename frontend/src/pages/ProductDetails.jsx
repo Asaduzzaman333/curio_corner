@@ -14,6 +14,18 @@ export default function ProductDetails() {
   const [active, setActive] = useState("/assets/cover.jpg");
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [zoomStyle, setZoomStyle] = useState({});
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomStyle({ transformOrigin: `${x}% ${y}%`, transform: "scale(2)" });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomStyle({ transformOrigin: "center", transform: "scale(1)" });
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -65,8 +77,17 @@ export default function ProductDetails() {
     <section className="min-h-screen px-5 pb-24 pt-32">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_0.85fr]">
         <div>
-          <div className="overflow-hidden rounded-[36px] bg-paper shadow-soft dark:bg-[#211915]">
-            <img src={active} alt={product.name} className="aspect-square sm:aspect-[4/4.2] w-full object-contain block" />
+          <div 
+            className="group overflow-hidden rounded-[36px] bg-paper shadow-soft dark:bg-[#211915] cursor-crosshair"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <img 
+              src={active} 
+              alt={product.name} 
+              className="aspect-square sm:aspect-[4/4.2] w-full object-cover block transition-transform duration-300 ease-out" 
+              style={zoomStyle} 
+            />
           </div>
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
             {(product.images?.length ? product.images : [{ url: "/assets/cover.jpg" }]).map((image) => (
