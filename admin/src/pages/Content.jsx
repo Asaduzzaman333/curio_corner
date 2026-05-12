@@ -49,6 +49,11 @@ const mergeSettings = (data = {}) => ({
   contact: { ...fallback.contact, ...data.contact }
 });
 
+const convertDriveLinks = (text) => {
+  if (!text) return text;
+  return text.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/\S*/g, "https://drive.google.com/uc?export=view&id=$1");
+};
+
 export default function Content() {
   const [settings, setSettings] = useState(fallback);
   const [socialLinks, setSocialLinks] = useState({ facebook: "", instagram: "" });
@@ -147,7 +152,7 @@ export default function Content() {
             <div>
               <label className="mb-2 block text-sm text-vellum/60">Logo URL</label>
               <div className="flex gap-2">
-                <input className="input" value={settings.logo?.url || ""} onChange={(e) => setSettings({ ...settings, logo: { url: e.target.value } })} placeholder="Paste uploaded logo URL" />
+                <input className="input" value={settings.logo?.url || ""} onChange={(e) => setSettings({ ...settings, logo: { url: convertDriveLinks(e.target.value) } })} placeholder="Paste uploaded logo URL" />
                 <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">
                   <Upload size={17} />
                   <input type="file" accept="image/*" className="hidden" disabled={uploading === "logo"} onChange={(e) => uploadAsset("logo", e.target.files?.[0])} />
@@ -159,7 +164,7 @@ export default function Content() {
             <div>
               <label className="mb-2 block text-sm text-vellum/60">Cover Image URL</label>
               <div className="flex gap-2">
-                <input className="input" value={settings.cover?.url || ""} onChange={(e) => setSettings({ ...settings, cover: { url: e.target.value } })} placeholder="Paste uploaded cover URL" />
+                <input className="input" value={settings.cover?.url || ""} onChange={(e) => setSettings({ ...settings, cover: { url: convertDriveLinks(e.target.value) } })} placeholder="Paste uploaded cover URL" />
                 <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">
                   <Upload size={17} />
                   <input type="file" accept="image/*" className="hidden" disabled={uploading === "cover"} onChange={(e) => uploadAsset("cover", e.target.files?.[0])} />
@@ -171,7 +176,7 @@ export default function Content() {
             <div>
               <label className="mb-2 block text-sm text-vellum/60">About Image URL</label>
               <div className="flex gap-2">
-                <input className="input" value={settings.aboutImage?.url || ""} onChange={(e) => setSettings({ ...settings, aboutImage: { url: e.target.value } })} placeholder="Paste uploaded about image URL" />
+                <input className="input" value={settings.aboutImage?.url || ""} onChange={(e) => setSettings({ ...settings, aboutImage: { url: convertDriveLinks(e.target.value) } })} placeholder="Paste uploaded about image URL" />
                 <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">
                   <Upload size={17} />
                   <input type="file" accept="image/*" className="hidden" disabled={uploading === "aboutImage"} onChange={(e) => uploadAsset("aboutImage", e.target.files?.[0])} />
@@ -192,7 +197,7 @@ export default function Content() {
                 <div className="flex gap-2">
                   <input className="input" value={settings.heroImages?.[index]?.url || ""} onChange={(e) => {
                     const newHeroImages = [...(settings.heroImages || fallback.heroImages)];
-                    newHeroImages[index] = { url: e.target.value };
+                    newHeroImages[index] = { url: convertDriveLinks(e.target.value) };
                     setSettings({ ...settings, heroImages: newHeroImages });
                   }} placeholder="Paste image URL" />
                   <label className="flex cursor-pointer items-center rounded-2xl bg-white/8 px-4 hover:bg-clay">

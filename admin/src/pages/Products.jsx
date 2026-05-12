@@ -29,6 +29,11 @@ const parseImageUrls = (text) =>
     .map((url) => url.trim())
     .filter(Boolean);
 
+const convertDriveLinks = (text) => {
+  if (!text) return text;
+  return text.replace(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/\S*/g, "https://drive.google.com/uc?export=view&id=$1");
+};
+
 export default function Products() {
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(initialForm);
@@ -194,7 +199,7 @@ export default function Products() {
                   <input type="file" accept="image/*" className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "main")} />
                 </label>
               </div>
-              <input className="input" placeholder="Main photo URL. This appears on product cards and as first product image." value={form.mainImageUrl} onChange={(e) => setForm({ ...form, mainImageUrl: e.target.value })} />
+              <input className="input" placeholder="Main photo URL. This appears on product cards and as first product image." value={form.mainImageUrl} onChange={(e) => setForm({ ...form, mainImageUrl: convertDriveLinks(e.target.value) })} />
               {form.mainImageUrl && (
                 <div className="mt-3 w-40 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                   <img src={form.mainImageUrl} alt={`${form.name || "Product"} main`} className="aspect-square w-full object-cover" />
@@ -210,7 +215,7 @@ export default function Products() {
                   <input type="file" accept="image/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
                 </label>
               </div>
-              <textarea className="input" rows="4" placeholder="Extra product detail/gallery image URLs, one per line." value={form.galleryImagesText} onChange={(e) => setForm({ ...form, galleryImagesText: e.target.value })} />
+              <textarea className="input" rows="4" placeholder="Extra product detail/gallery image URLs, one per line." value={form.galleryImagesText} onChange={(e) => setForm({ ...form, galleryImagesText: convertDriveLinks(e.target.value) })} />
               {imageUrls.length > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {imageUrls.map((url, index) => (
