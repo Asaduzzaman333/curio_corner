@@ -83,7 +83,7 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {products.slice(0, 3).map((product, index) => (
                 <Link key={product._id} to={`/products/${product.slug}`} className={`${index === 1 ? "mt-10" : ""} overflow-hidden rounded-[28px] bg-white shadow-soft`}>
-                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[3/4] h-full w-full object-contain transition duration-700 hover:scale-105" />
+                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
                 </Link>
               ))}
             </div>
