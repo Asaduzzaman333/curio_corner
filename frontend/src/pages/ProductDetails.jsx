@@ -130,7 +130,7 @@ export default function ProductDetails() {
             </button>
           </div>
           {product.videoUrl && (
-            <a href={product.videoUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 px-6 py-4 font-semibold hover:text-clay dark:border-white/10">
+            <a href={product.videoUrl.replace(/(?:https?:\/\/)?lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/gi, "https://drive.google.com/file/d/$1/view")} target="_blank" rel="noreferrer" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink/10 px-6 py-4 font-semibold hover:text-clay dark:border-white/10">
               <PlayCircle size={19} /> Watch Product Video
             </a>
           )}
