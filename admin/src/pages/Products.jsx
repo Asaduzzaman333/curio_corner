@@ -1,8 +1,54 @@
-import { Edit3, Plus, Trash2, Upload } from "lucide-react";
+import { Edit, Plus, Search, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
 import { api } from "../utils/api.js";
+
+const MediaRenderer = ({ src, alt, className }) => {
+  const isVideoUrl = src?.includes('/video/upload/') || src?.match(/\.(mp4|webm|ogg|mov)$/i);
+  const [type, setType] = useState(isVideoUrl ? "video" : "image");
+  const [errorCount, setErrorCount] = useState(0);
+
+  useEffect(() => {
+    setType(isVideoUrl ? "video" : "image");
+    setErrorCount(0);
+  }, [src, isVideoUrl]);
+
+  if (!src) return null;
+
+  if (type === "video") {
+    return (
+      <video
+        src={src}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={className}
+        onError={() => {
+          if (errorCount === 0 && !isVideoUrl) {
+            setType("image");
+            setErrorCount(1);
+          }
+        }}
+      />
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => {
+        if (errorCount === 0 && !isVideoUrl) {
+          setType("video");
+          setErrorCount(1);
+        }
+      }}
+    />
+  );
+};
 
 const initialForm = {
   name: "",
@@ -14,7 +60,7 @@ const initialForm = {
   galleryImages: ["", "", ""],
   videoUrl: "",
   stockStatus: "made-to-order",
-  tagsText: "handmade, customized",
+  tagsText: "",
   isFeatured: false,
   isTrending: false,
   isPublished: true,
@@ -198,13 +244,13 @@ export default function Products() {
                 <label className="text-sm text-vellum/60">Main product photo URL</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
                   <Upload size={16} /> {uploadingImages === "main" ? "Uploading..." : "Upload Main Photo"}
-                  <input type="file" accept="image/*" className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "main")} />
+                  <input type="file" accept="image/*,video/*" className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "main")} />
                 </label>
               </div>
               <input className="input" placeholder="Main photo URL. This appears on product cards and as first product image." value={form.mainImageUrl} onChange={(e) => setForm({ ...form, mainImageUrl: convertDriveLinks(e.target.value) })} />
               {form.mainImageUrl && (
                 <div className="mt-3 w-40 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                  <img src={form.mainImageUrl} alt={`${form.name || "Product"} main`} className="aspect-square w-full object-cover" />
+                  <MediaRenderer src={form.mainImageUrl} alt={`${form.name || "Product"} main`} className="aspect-square w-full object-cover" />
                   <div className="px-3 py-2 text-xs font-semibold text-vellum/70">Main photo</div>
                 </div>
               )}
@@ -214,7 +260,7 @@ export default function Products() {
                 <label className="text-sm text-vellum/60">Additional gallery photo URLs (Max 3)</label>
                 <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white/8 px-4 py-2 text-sm font-semibold hover:bg-clay">
                   <Upload size={16} /> {uploadingImages === "gallery" ? "Uploading..." : "Upload Gallery Photos"}
-                  <input type="file" accept="image/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
+                  <input type="file" accept="image/*,video/*" multiple className="hidden" disabled={Boolean(uploadingImages)} onChange={(e) => uploadImages(e.target.files, "gallery")} />
                 </label>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -236,7 +282,7 @@ export default function Products() {
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   {imageUrls.map((url, index) => (
                     <div key={url} className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                      <img src={url} alt={`${form.name || "Product"} ${index + 1}`} className="aspect-square w-full object-cover" />
+                      <MediaRenderer src={url} alt={`${form.name || "Product"} ${index + 1}`} className="aspect-square w-full object-cover" />
                       {index === 0 ? (
                         <button type="button" onClick={() => setForm({ ...form, mainImageUrl: "" })} className="absolute right-2 top-2 rounded-full bg-rosewood p-2 text-white shadow-lift">
                           <Trash2 size={14} />
@@ -285,7 +331,7 @@ export default function Products() {
                 <tr key={product._id}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <img src={convertDriveLinks(product.images?.[0]?.url) || "/assets/cover.jpg"} alt="" className="h-12 w-12 rounded-2xl object-cover" />
+                      <MediaRenderer src={convertDriveLinks(product.images?.[0]?.url) || "/assets/cover.jpg"} alt="" className="h-12 w-12 rounded-2xl object-cover" />
                       <span className="font-semibold">{product.name}</span>
                     </div>
                   </td>

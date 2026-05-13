@@ -11,8 +11,9 @@ export const mediaRoutes = express.Router();
 
 const uploadBuffer = (file) =>
   new Promise((resolve, reject) => {
+    const isVideo = file.mimetype.startsWith("video/");
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "curio-corner", resource_type: "image", quality: "auto", fetch_format: "auto" },
+      { folder: "curio-corner", resource_type: isVideo ? "video" : "image", quality: "auto" },
       (error, result) => (error ? reject(error) : resolve(result))
     );
     Readable.from(file.buffer).pipe(stream);
