@@ -5,7 +5,10 @@ import PageHeader from "../components/PageHeader.jsx";
 import { api } from "../utils/api.js";
 
 const MediaRenderer = ({ src, alt, className }) => {
-  const safeSrc = typeof src === 'string' ? src : '';
+  let safeSrc = typeof src === 'string' ? src : '';
+  safeSrc = safeSrc.replace(/(?:https?:\/\/)?lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/gi, "https://drive.google.com/uc?export=download&id=$1");
+  safeSrc = safeSrc.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=download&id=$1");
+
   const isVideoUrl = Boolean(safeSrc.includes('/video/upload/') || safeSrc.match(/\.(mp4|webm|ogg|mov)$/i));
   const [type, setType] = useState(isVideoUrl ? "video" : "image");
   const [errorCount, setErrorCount] = useState(0);
@@ -72,8 +75,9 @@ const fallbackCategories = ["Handmade Cards", "Gift Boxes", "Handmade Art", "Cra
 
 const convertDriveLinks = (text) => {
   if (!text) return text;
-  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://lh3.googleusercontent.com/d/$1");
-  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://lh3.googleusercontent.com/d/$1");
+  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=download&id=$1");
+  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://drive.google.com/uc?export=download&id=$1");
+  converted = converted.replace(/(?:https?:\/\/)?lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/gi, "https://drive.google.com/uc?export=download&id=$1");
   return converted;
 };
 

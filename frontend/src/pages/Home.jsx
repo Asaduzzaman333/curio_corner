@@ -10,7 +10,10 @@ import { api } from "../utils/api.js";
 import { categories as fallbackCategories, fallbackProducts } from "../data/fallback.js";
 
 const MediaRenderer = ({ src, alt, className }) => {
-  const safeSrc = typeof src === 'string' ? src : '';
+  let safeSrc = typeof src === 'string' ? src : '';
+  safeSrc = safeSrc.replace(/(?:https?:\/\/)?lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/gi, "https://drive.google.com/uc?export=download&id=$1");
+  safeSrc = safeSrc.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=download&id=$1");
+
   const isVideoUrl = Boolean(safeSrc.includes('/video/upload/') || safeSrc.match(/\.(mp4|webm|ogg|mov)$/i));
   const [type, setType] = useState(isVideoUrl ? "video" : "image");
   const [errorCount, setErrorCount] = useState(0);

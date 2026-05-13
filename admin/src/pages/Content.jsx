@@ -36,8 +36,9 @@ const fallback = {
 
 const convertDriveLinks = (text) => {
   if (!text) return text;
-  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://lh3.googleusercontent.com/d/$1");
-  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://lh3.googleusercontent.com/d/$1");
+  let converted = text.replace(/(?:https?:\/\/)?(?:www\.)?drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)(?:\/[^\s]*)?/gi, "https://drive.google.com/uc?export=download&id=$1");
+  converted = converted.replace(/(?:https?:\/\/)?(?:www\.)?(?:drive|drive\.usercontent)\.google\.com\/(?:open|uc|download)\?(?:[^&\s]*&)*id=([a-zA-Z0-9_-]+)[^\s]*/gi, "https://drive.google.com/uc?export=download&id=$1");
+  converted = converted.replace(/(?:https?:\/\/)?lh3\.googleusercontent\.com\/d\/([a-zA-Z0-9_-]+)/gi, "https://drive.google.com/uc?export=download&id=$1");
   return converted;
 };
 
