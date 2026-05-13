@@ -10,21 +10,22 @@ import { api } from "../utils/api.js";
 import { categories as fallbackCategories, fallbackProducts } from "../data/fallback.js";
 
 const MediaRenderer = ({ src, alt, className }) => {
-  const isVideoUrl = src?.includes('/video/upload/') || src?.match(/\.(mp4|webm|ogg|mov)$/i);
+  const safeSrc = typeof src === 'string' ? src : '';
+  const isVideoUrl = Boolean(safeSrc.includes('/video/upload/') || safeSrc.match(/\.(mp4|webm|ogg|mov)$/i));
   const [type, setType] = useState(isVideoUrl ? "video" : "image");
   const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
     setType(isVideoUrl ? "video" : "image");
     setErrorCount(0);
-  }, [src, isVideoUrl]);
+  }, [safeSrc, isVideoUrl]);
 
-  if (!src) return null;
+  if (!safeSrc) return null;
 
   if (type === "video") {
     return (
       <video
-        src={src}
+        src={safeSrc}
         autoPlay
         loop
         muted
@@ -42,7 +43,7 @@ const MediaRenderer = ({ src, alt, className }) => {
 
   return (
     <img
-      src={src}
+      src={safeSrc}
       alt={alt}
       className={className}
       loading="lazy"
