@@ -6,58 +6,6 @@ import { useCart } from "../context/CartContext.jsx";
 import { api } from "../utils/api.js";
 import { createDirectOrderItem, saveDirectOrder } from "../utils/directOrder.js";
 
-const MediaRenderer = ({ src, alt, className, style, isMain }) => {
-  const safeSrc = typeof src === 'string' ? src : '';
-
-  const isVideoUrl = Boolean(safeSrc.includes('/video/upload/') || safeSrc.match(/\.(mp4|webm|ogg|mov)$/i));
-  const [type, setType] = useState(isVideoUrl ? "video" : "image");
-  const [errorCount, setErrorCount] = useState(0);
-
-  useEffect(() => {
-    setType(isVideoUrl ? "video" : "image");
-    setErrorCount(0);
-  }, [safeSrc, isVideoUrl]);
-
-  if (!safeSrc) return null;
-
-  if (type === "video") {
-    return (
-      <video
-        src={safeSrc}
-        autoPlay
-        loop
-        muted
-        playsInline
-        controls={isMain}
-        className={className}
-        style={style}
-        onError={() => {
-          if (errorCount === 0 && !isVideoUrl) {
-            setType("image");
-            setErrorCount(1);
-          }
-        }}
-      />
-    );
-  }
-
-  return (
-    <img
-      src={safeSrc}
-      alt={alt}
-      className={className}
-      style={style}
-      loading={isMain ? undefined : "lazy"}
-      onError={() => {
-        if (errorCount === 0 && !isVideoUrl) {
-          setType("video");
-          setErrorCount(1);
-        }
-      }}
-    />
-  );
-};
-
 export default function ProductDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -134,18 +82,17 @@ export default function ProductDetails() {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
-            <MediaRenderer 
+            <img 
               src={active} 
               alt={product.name} 
               className="aspect-square sm:aspect-[4/4.2] w-full object-cover block transition-transform duration-300 ease-out" 
               style={zoomStyle} 
-              isMain={true}
             />
           </div>
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
             {(product.images?.length ? product.images : [{ url: "/assets/cover.jpg" }]).map((image) => (
               <button key={image.url} onClick={() => setActive(image.url)} className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 ${active === image.url ? "border-clay" : "border-transparent"}`}>
-                <MediaRenderer src={image.url} alt={image.alt || product.name} className="h-full w-full object-cover" />
+                <img src={image.url} alt={image.alt || product.name} className="h-full w-full object-cover" />
               </button>
             ))}
           </div>

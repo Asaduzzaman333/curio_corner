@@ -9,55 +9,6 @@ import { useSite } from "../context/SiteContext.jsx";
 import { api } from "../utils/api.js";
 import { categories as fallbackCategories, fallbackProducts } from "../data/fallback.js";
 
-const MediaRenderer = ({ src, alt, className }) => {
-  const safeSrc = typeof src === 'string' ? src : '';
-
-  const isVideoUrl = Boolean(safeSrc.includes('/video/upload/') || safeSrc.match(/\.(mp4|webm|ogg|mov)$/i));
-  const [type, setType] = useState(isVideoUrl ? "video" : "image");
-  const [errorCount, setErrorCount] = useState(0);
-
-  useEffect(() => {
-    setType(isVideoUrl ? "video" : "image");
-    setErrorCount(0);
-  }, [safeSrc, isVideoUrl]);
-
-  if (!safeSrc) return null;
-
-  if (type === "video") {
-    return (
-      <video
-        src={safeSrc}
-        autoPlay
-        loop
-        muted
-        playsInline
-        className={className}
-        onError={() => {
-          if (errorCount === 0 && !isVideoUrl) {
-            setType("image");
-            setErrorCount(1);
-          }
-        }}
-      />
-    );
-  }
-
-  return (
-    <img
-      src={safeSrc}
-      alt={alt}
-      className={className}
-      loading="lazy"
-      onError={() => {
-        if (errorCount === 0 && !isVideoUrl) {
-          setType("video");
-          setErrorCount(1);
-        }
-      }}
-    />
-  );
-};
-
 const categoryIcons = [Gift, Heart, Sparkles, Star, ArrowRight];
 
 export default function Home() {
@@ -129,7 +80,7 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {(settings.heroImages?.length === 3 ? settings.heroImages : [{ url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }, { url: "/assets/cover.jpg" }]).map((image, index) => (
                 <div key={index} className={`${index === 1 ? "mt-10" : ""} overflow-hidden rounded-[28px] bg-white shadow-soft`}>
-                  <MediaRenderer src={image.url || "/assets/cover.jpg"} alt={`Hero ${index + 1}`} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
+                  <img src={image.url || "/assets/cover.jpg"} alt={`Hero ${index + 1}`} className="aspect-[3/4] h-full w-full object-cover transition duration-700 hover:scale-105" />
                 </div>
               ))}
             </div>
@@ -167,7 +118,7 @@ export default function Home() {
       <section className="px-5 py-20">
         <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="overflow-hidden rounded-[36px] shadow-soft">
-            <MediaRenderer src={settings.aboutImage?.url || settings.cover?.url || "/assets/cover.jpg"} alt="Handmade craft table" className="aspect-[4/5] w-full object-cover" />
+            <img src={settings.aboutImage?.url || settings.cover?.url || "/assets/cover.jpg"} alt="Handmade craft table" className="aspect-[4/5] w-full object-cover" />
           </div>
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-clay">About the brand</p>
@@ -206,7 +157,7 @@ export default function Home() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {products.slice(0, 6).map((product) => (
                 <Link key={product._id} to={`/products/${product.slug}`} className="group overflow-hidden rounded-[28px] bg-vellum shadow-soft dark:bg-[#211915]">
-                  <MediaRenderer src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[4/3] w-full object-cover transition duration-700 hover:scale-105" />
+                  <img src={product.images?.[0]?.url || "/assets/cover.jpg"} alt={product.name} className="aspect-[4/3] w-full object-cover transition duration-700 hover:scale-105" />
                 </Link>
               ))}
             </div>
