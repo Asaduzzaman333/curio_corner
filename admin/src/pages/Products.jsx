@@ -1,4 +1,4 @@
-import { Edit, Plus, Search, Trash2, Upload } from "lucide-react";
+import { Edit3, Plus, Search, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
