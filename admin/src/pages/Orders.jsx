@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import PageHeader from "../components/PageHeader.jsx";
@@ -20,6 +21,14 @@ export default function Orders() {
   const updateStatus = async (id, status) => {
     await api.patch(`/orders/${id}/status`, { status });
     toast.success("Order updated");
+    load();
+  };
+
+  const remove = async (order) => {
+    if (!confirm(`Delete order from ${order.customerName}?`)) return;
+    await api.delete(`/orders/${order._id}`);
+    toast.success("Order deleted");
+    setExpandedId((current) => (current === order._id ? null : current));
     load();
   };
 
@@ -47,6 +56,14 @@ export default function Orders() {
                   className="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20 md:py-2.5"
                 >
                   {expandedId === order._id ? "Hide" : "Details"}
+                </button>
+                <button
+                  onClick={() => remove(order)}
+                  className="rounded-full bg-white/8 p-2.5 text-vellum hover:bg-rosewood"
+                  aria-label={`Delete order from ${order.customerName}`}
+                  title="Delete order"
+                >
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

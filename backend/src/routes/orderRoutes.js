@@ -64,3 +64,14 @@ orderRoutes.patch(
     res.json(order);
   })
 );
+
+orderRoutes.delete(
+  "/:id",
+  protectAdmin,
+  asyncHandler(async (req, res) => {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    await ActivityLog.create({ actor: req.admin.email, action: "delete", entity: "Order", entityId: order._id });
+    res.json({ message: "Order deleted" });
+  })
+);
