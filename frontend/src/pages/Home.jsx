@@ -161,6 +161,11 @@ export default function Home() {
                 </Link>
               ))}
             </div>
+            <div className="mt-8 flex justify-center">
+              <Link to="/shop" className="focus-ring inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-semibold text-vellum shadow-lift transition hover:bg-clay dark:bg-vellum dark:text-ink">
+                See all <ArrowRight size={18} />
+              </Link>
+            </div>
           </div>
         </section>
       )}
